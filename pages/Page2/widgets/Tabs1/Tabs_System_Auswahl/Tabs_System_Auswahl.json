@@ -5,12 +5,12 @@
   "borderColor": "#E0DEDE",
   "borderRadius": "{{appsmith.theme.borderRadius.appBorderRadius}}",
   "borderWidth": 1,
-  "bottomRow": 19,
+  "bottomRow": 4,
   "boxShadow": "{{appsmith.theme.boxShadow.appBoxShadow}}",
   "children": [
     {
       "borderRadius": "{{appsmith.theme.borderRadius.appBorderRadius}}",
-      "bottomRow": 980,
+      "bottomRow": 150,
       "boxShadow": "{{appsmith.theme.boxShadow.appBoxShadow}}",
       "canExtend": true,
       "detachFromLayout": true,
@@ -236,7 +236,7 @@
       "widgetName": "Canvas14"
     }
   ],
-  "defaultTab": "System 1",
+  "defaultTab": "",
   "dynamicBindingPathList": [
     {
       "key": "accentColor"
@@ -248,7 +248,7 @@
       "key": "boxShadow"
     }
   ],
-  "dynamicHeight": "AUTO_HEIGHT",
+  "dynamicHeight": "FIXED",
   "dynamicTriggerPathList": [],
   "flexVerticalAlignment": "stretch",
   "isCanvas": true,
@@ -264,14 +264,12 @@
   "mobileRightColumn": 11,
   "mobileTopRow": 1,
   "needsErrorInfo": false,
-  "originalBottomRow": 19,
-  "originalTopRow": 0,
   "parentColumnSpace": 22.4833984375,
   "parentId": "0ules224ow",
   "parentRowSpace": 10,
   "renderMode": "CANVAS",
   "responsiveBehavior": "fill",
-  "rightColumn": 63,
+  "rightColumn": 62,
   "shouldScrollContents": true,
   "shouldShowTabs": true,
   "tabsObj": {

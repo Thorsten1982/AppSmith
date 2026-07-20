@@ -29,10 +29,10 @@
           "data": ""
         },
         "rowObjects": {
-          "data": "[\n  {\n    \"Status\": \"Fertig\",\n    \"Programmiert_Am\": \"{{ moment().format('DD.MM.YYYY HH:mm') }}\"\n  }\n]"
+          "data": "{{\n  (() => {\n    // Greift den übergebenen Index vom Button-Klick ab\n    const zeilenIndex = this.params.realRowIndex;\n\n    return {\n      \"rowIndex\": zeilenIndex,\n      \"Status\": \"Fertig\",\n      \"Programmiert_Am\": moment().format('DD.MM.YYYY HH:mm')\n    };\n  })()\n}}"
         },
         "sheetName": {
-          "data": "Stammdaten"
+          "data": "Tabellenblatt2"
         },
         "sheetUrl": {
           "data": "https://docs.google.com/spreadsheets/d/1mBo_V2bX7Ehu5iwYU7B-HRNyDYT57M5VetjH33J_tPk/edit"
