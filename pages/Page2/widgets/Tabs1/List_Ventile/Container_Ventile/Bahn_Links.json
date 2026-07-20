@@ -34,7 +34,7 @@
   "fontSize": "1rem",
   "fontStyle": "BOLD",
   "isLoading": false,
-  "isVisible": "{{ currentItem.weg_Position?.toLowerCase() === \"links\" }}",
+  "isVisible": "{{ currentItem.Weg_Position?.toLowerCase() === \"links\" }}",
   "key": "5gdxpyly2f",
   "leftColumn": 3,
   "maxDynamicHeight": 9000,

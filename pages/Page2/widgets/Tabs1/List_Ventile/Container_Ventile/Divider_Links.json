@@ -17,7 +17,7 @@
   ],
   "dynamicTriggerPathList": [],
   "isLoading": false,
-  "isVisible": "{{ currentItem.weg_Position?.toLowerCase() === \"links\" }}",
+  "isVisible": "{{ currentItem.Weg_Position?.toLowerCase() === \"links\" }}",
   "key": "gni0tu0ilt",
   "leftColumn": 0,
   "minWidth": 450,
