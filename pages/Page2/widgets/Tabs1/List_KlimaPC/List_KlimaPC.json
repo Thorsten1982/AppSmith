@@ -1,0 +1,127 @@
+{
+  "accentColor": "{{appsmith.theme.colors.primaryColor}}",
+  "additionalStaticProps": [
+    "level",
+    "levelData",
+    "prefixMetaWidgetId",
+    "metaWidgetId"
+  ],
+  "animateLoading": true,
+  "backgroundColor": "transparent",
+  "borderRadius": "{{appsmith.theme.borderRadius.appBorderRadius}}",
+  "bottomRow": 71,
+  "boxShadow": "{{appsmith.theme.boxShadow.appBoxShadow}}",
+  "children": [
+    {
+      "borderRadius": "{{appsmith.theme.borderRadius.appBorderRadius}}",
+      "bottomRow": 660,
+      "boxShadow": "{{appsmith.theme.boxShadow.appBoxShadow}}",
+      "canExtend": false,
+      "containerStyle": "none",
+      "detachFromLayout": true,
+      "dropDisabled": true,
+      "dynamicBindingPathList": [
+        {
+          "key": "borderRadius"
+        },
+        {
+          "key": "boxShadow"
+        }
+      ],
+      "dynamicHeight": "AUTO_HEIGHT",
+      "flexLayers": [],
+      "isLoading": false,
+      "isVisible": true,
+      "key": "yn0nnfo4sy",
+      "leftColumn": 0,
+      "maxDynamicHeight": 9000,
+      "minDynamicHeight": 4,
+      "minHeight": 400,
+      "minWidth": 450,
+      "mobileBottomRow": 400,
+      "mobileLeftColumn": 0,
+      "mobileRightColumn": 299.0625,
+      "mobileTopRow": 0,
+      "needsErrorInfo": false,
+      "noPad": true,
+      "openParentPropertyPane": true,
+      "parentColumnSpace": 1,
+      "parentId": "7hn4qxfu6o",
+      "parentRowSpace": 1,
+      "renderMode": "CANVAS",
+      "responsiveBehavior": "fill",
+      "rightColumn": 299.0625,
+      "topRow": 0,
+      "type": "CANVAS_WIDGET",
+      "version": 1,
+      "widgetId": "zf0ti5otur",
+      "widgetName": "Canvas6"
+    }
+  ],
+  "currentItemsView": "{{[]}}",
+  "dynamicBindingPathList": [
+    {
+      "key": "currentItemsView"
+    },
+    {
+      "key": "selectedItemView"
+    },
+    {
+      "key": "triggeredItemView"
+    },
+    {
+      "key": "primaryKeys"
+    },
+    {
+      "key": "accentColor"
+    },
+    {
+      "key": "borderRadius"
+    },
+    {
+      "key": "boxShadow"
+    },
+    {
+      "key": "listData"
+    }
+  ],
+  "dynamicTriggerPathList": [],
+  "enhancements": true,
+  "flexVerticalAlignment": "start",
+  "gridType": "vertical",
+  "hasMetaWidgets": true,
+  "isCanvas": true,
+  "isLoading": false,
+  "isVisible": true,
+  "itemBackgroundColor": "#FFFFFF",
+  "itemSpacing": "0",
+  "key": "82ppipmxwc",
+  "leftColumn": 1,
+  "listData": "{{\n  Bewaesserung_Lesen.data.filter(row => {\n    // 1. Status-Filter: Nur anzeigen, was NICHT \"Fertig\" ist\n    const stat = String(row.Status || \"\").trim();\n    if (stat === \"Fertig\") return false;\n\n    // 2. System-Filter: Nur anzeigen, was im Store ausgewählt ist\n    // Wenn nichts ausgewählt ist, zeige alles an.\n    const gewaehltesSystem = appsmith.store.aktivSystem;\n    if (!gewaehltesSystem) return true;\n\n    const zeilenSystem = String(row.System || \"\").trim();\n    return zeilenSystem === gewaehltesSystem;\n  })\n}}",
+  "mainCanvasId": "zf0ti5otur",
+  "mainContainerId": "lw73zlnemx",
+  "minWidth": 450,
+  "mobileBottomRow": 158,
+  "mobileLeftColumn": 0,
+  "mobileRightColumn": 15,
+  "mobileTopRow": 118,
+  "needsErrorInfo": false,
+  "originalBottomRow": 176,
+  "originalTopRow": 136,
+  "pageSize": 11,
+  "parentColumnSpace": 19.9375,
+  "parentId": "0ules224ow",
+  "parentRowSpace": 10,
+  "primaryKeys": "{{List_KlimaPC.listData.map((currentItem, currentIndex) => currentItem[\"rowIndex\"] )}}",
+  "renderMode": "CANVAS",
+  "requiresFlatWidgetChildren": true,
+  "responsiveBehavior": "fill",
+  "rightColumn": 64,
+  "selectedItemView": "{{{}}}",
+  "templateHeight": 160,
+  "topRow": 5,
+  "triggeredItemView": "{{{}}}",
+  "type": "LIST_WIDGET_V2",
+  "widgetId": "7hn4qxfu6o",
+  "widgetName": "List_KlimaPC"
+}

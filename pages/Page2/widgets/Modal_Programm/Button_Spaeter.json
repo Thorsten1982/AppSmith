@@ -1,0 +1,57 @@
+{
+  "animateLoading": true,
+  "borderRadius": "{{appsmith.theme.borderRadius.appBorderRadius}}",
+  "bottomRow": 17,
+  "boxShadow": "none",
+  "buttonColor": "{{ appsmith.store.selectedModus === 'Später' ? '#f97316' : '#3b82f6' }}",
+  "buttonStyle": "PRIMARY_BUTTON",
+  "buttonVariant": "PRIMARY",
+  "disabledWhenInvalid": false,
+  "dynamicBindingPathList": [
+    {
+      "key": "buttonColor"
+    },
+    {
+      "key": "borderRadius"
+    }
+  ],
+  "dynamicPropertyPathList": [
+    {
+      "key": "onClick"
+    },
+    {
+      "key": "buttonColor"
+    }
+  ],
+  "dynamicTriggerPathList": [
+    {
+      "key": "onClick"
+    }
+  ],
+  "isDefaultClickDisabled": true,
+  "isDisabled": false,
+  "isLoading": false,
+  "isVisible": true,
+  "key": "wjiiv6g614",
+  "leftColumn": 19,
+  "minWidth": 120,
+  "mobileBottomRow": 22,
+  "mobileLeftColumn": 47,
+  "mobileRightColumn": 63,
+  "mobileTopRow": 18,
+  "needsErrorInfo": false,
+  "onClick": "{{\n  (async () => {\n    // 1. Store setzen\n    await storeValue('selectedModus', 'Später'); \n    \n    // 2. Query ausführen\n    try {\n      await Bewaesserung_Speichern.run({\n        ventilName: appsmith.store.activeVentil,\n        programm: appsmith.store.selectedProg,\n        modus: 'Zeit',\n        stammDaten: Stammdaten.data\n      });\n      \n      // 3. Daten neu lesen\n      await Bewaesserung_Lesen.run();\n      \n      // 4. Modal schließen und Erfolgsmeldung\n      closeModal('Modal_Programm');\n      showAlert(\"Programm auf 'Später' gespeichert.\", \"success\");\n      \n    } catch (e) {\n      showAlert(\"Fehler beim Speichern: \" + e.message, \"error\");\n    }\n  })()\n}}",
+  "parentId": "y19f9v8qbz",
+  "placement": "CENTER",
+  "recaptchaType": "V3",
+  "renderMode": "CANVAS",
+  "resetFormOnClick": false,
+  "responsiveBehavior": "hug",
+  "rightColumn": 35,
+  "text": "Später\n",
+  "topRow": 13,
+  "type": "BUTTON_WIDGET",
+  "version": 1,
+  "widgetId": "dg4hhpg0ey",
+  "widgetName": "Button_Spaeter"
+}

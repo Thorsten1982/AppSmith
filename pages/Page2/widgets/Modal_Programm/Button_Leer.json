@@ -1,0 +1,54 @@
+{
+  "animateLoading": true,
+  "borderRadius": "{{appsmith.theme.borderRadius.appBorderRadius}}",
+  "bottomRow": 5,
+  "boxShadow": "none",
+  "buttonColor": "{{appsmith.theme.colors.primaryColor}}",
+  "buttonStyle": "PRIMARY_BUTTON",
+  "buttonVariant": "PRIMARY",
+  "disabledWhenInvalid": false,
+  "dynamicBindingPathList": [
+    {
+      "key": "buttonColor"
+    },
+    {
+      "key": "borderRadius"
+    }
+  ],
+  "dynamicPropertyPathList": [
+    {
+      "key": "onClick"
+    }
+  ],
+  "dynamicTriggerPathList": [
+    {
+      "key": "onClick"
+    }
+  ],
+  "isDefaultClickDisabled": true,
+  "isDisabled": false,
+  "isLoading": false,
+  "isVisible": true,
+  "key": "wjiiv6g614",
+  "leftColumn": 37,
+  "minWidth": 120,
+  "mobileBottomRow": 22,
+  "mobileLeftColumn": 47,
+  "mobileRightColumn": 63,
+  "mobileTopRow": 18,
+  "needsErrorInfo": false,
+  "onClick": "{{\n  (async () => {\n    const storeVentil = String(appsmith.store.activeVentil || \"\").trim();\n\n    // Zeilen-Index in den Stammdaten suchen\n    const foundIndex = Stammdaten.data.findIndex(r => \n      String(r.Ventil_Links || \"\").trim() === storeVentil || \n      String(r.Ventil_Rechts || \"\").trim() === storeVentil\n    );\n\n    if (foundIndex === -1) {\n      showAlert(\"Fehler: Ventil wurde nicht in den Stammdaten gefunden!\", \"error\");\n      return;\n    }\n\n    try {\n      // Wir übergeben den Index 37 jetzt direkt an die Query\n      await Stammdaten_Update.run({\n        targetIndex: foundIndex\n      });\n\n      // UI aktualisieren\n      await Stammdaten.run(); \n      await Bewaesserung_Lesen.run();\n      \n      showAlert(\"Ventilstatus auf 'Nicht belegt' gesetzt.\", \"success\");\n      closeModal('Modal_Programm');\n    } catch (e) {\n      showAlert(\"Fehler beim Updaten: \" + e.message, \"error\");\n    }\n  })()\n}}",
+  "parentId": "y19f9v8qbz",
+  "placement": "CENTER",
+  "recaptchaType": "V3",
+  "renderMode": "CANVAS",
+  "resetFormOnClick": false,
+  "responsiveBehavior": "hug",
+  "rightColumn": 53,
+  "text": "Nicht belegt\n",
+  "topRow": 1,
+  "type": "BUTTON_WIDGET",
+  "version": 1,
+  "widgetId": "6c1gq8cb2p",
+  "widgetName": "Button_Leer"
+}

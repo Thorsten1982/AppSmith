@@ -1,0 +1,65 @@
+{
+  "animateLoading": true,
+  "borderRadius": "0px",
+  "bottomRow": 4,
+  "boxShadow": "none",
+  "buttonColor": "{{\n  (() => {\n    // 1. Spaltennamen anpassen\n    const ventSpalte = \"Ventil_Links\"; \n    const leerSpalte = \"Status_Leer_Links\";\n    \n    const rawVal = String(currentItem[ventSpalte] || \"\").trim();\n    if (!rawVal) return '#3b82f6';\n    \n    // 2. PRÜFUNG: Stammdaten \"Leer\"-Status\n    // Wir suchen nach der exakten Zeile in Stammdaten\n    const stammdatenEintrag = (Stammdaten.data || []).find(row => \n        String(row[ventSpalte] || \"\").trim() === rawVal\n    );\n\n    // Prüfe auf TRUE (als Boolean oder String)\n    if (stammdatenEintrag && \n       (stammdatenEintrag[leerSpalte] === true || String(stammdatenEintrag[leerSpalte]).toUpperCase() === \"TRUE\")) {\n        return '#e5e7eb'; // Grau\n    }\n    \n    // 3. Restliche Logik (wie bisher)\n    const btnVal = parseFloat(rawVal).toFixed(2);\n    \n    const alleEintraege = (Bewaesserung_Lesen.data || []).filter(row => {\n        return parseFloat(row.Ventil || 0).toFixed(2) === btnVal;\n    });\n\n    if (alleEintraege.length > 0) {\n        alleEintraege.sort((a, b) => {\n            const dateA = new Date(a.Zeitstempel.split(' ')[0].split('.').reverse().join('-'));\n            const dateB = new Date(b.Zeitstempel.split(' ')[0].split('.').reverse().join('-'));\n            return dateB - dateA;\n        });\n\n        const latest = alleEintraege[0];\n        const dateLatest = new Date(latest.Zeitstempel.split(' ')[0].split('.').reverse().join('-'));\n        const heute = new Date();\n        \n        const istHeute = (\n            dateLatest.getDate() === heute.getDate() &&\n            dateLatest.getMonth() === heute.getMonth() &&\n            dateLatest.getFullYear() === heute.getFullYear()\n        );\n\n        if (!istHeute) return '#3b82f6';\n        if (String(latest.Status || \"\").toLowerCase().includes(\"fertig\")) return '#22c55e';\n        \n        const m = String(latest.Modus || \"\").toLowerCase();\n        if (m.includes(\"jetzt\"))  return '#991b1b';\n        if (m.includes(\"später\")) return '#f97316';\n        if (m.includes(\"zeit\"))   return '#f87171';\n    }\n    \n    return '#3b82f6';\n  })()\n}}",
+  "buttonVariant": "PRIMARY",
+  "disabledWhenInvalid": false,
+  "dynamicBindingPathList": [
+    {
+      "key": "isVisible"
+    },
+    {
+      "key": "buttonColor"
+    },
+    {
+      "key": "text"
+    }
+  ],
+  "dynamicHeight": "FIXED",
+  "dynamicPropertyPathList": [
+    {
+      "key": "onClick"
+    },
+    {
+      "key": "buttonColor"
+    },
+    {
+      "key": "isVisible"
+    }
+  ],
+  "dynamicTriggerPathList": [
+    {
+      "key": "onClick"
+    }
+  ],
+  "isDefaultClickDisabled": true,
+  "isDisabled": false,
+  "isLoading": false,
+  "isVisible": "{{ !!currentItem[\"Ventil_Links\"] }}",
+  "key": "fq259tbe65",
+  "leftColumn": 12,
+  "minWidth": 120,
+  "mobileBottomRow": 7,
+  "mobileLeftColumn": 46,
+  "mobileRightColumn": 62,
+  "mobileTopRow": 3,
+  "needsErrorInfo": false,
+  "onClick": "{{ \n  storeValue('activeVentil', currentItem.Ventil_Links); \n  storeValue('selectedProg', ''); // Setzt das Programm beim Öffnen auf \"leer\" zurück\n  showModal('Modal_Programm'); \n}}",
+  "parentColumnSpace": 5.99169921875,
+  "parentId": "hf3klqmb2o",
+  "parentRowSpace": 10,
+  "placement": "CENTER",
+  "recaptchaType": "V3",
+  "renderMode": "CANVAS",
+  "resetFormOnClick": false,
+  "responsiveBehavior": "hug",
+  "rightColumn": 33,
+  "text": "{{\n  (() => {\n    // 1. Ventil identifizieren\n    const rawVal = String(currentItem.Ventil_Links || \"\").trim();\n    const btnVal = parseFloat(rawVal).toFixed(2);\n\n    // 2. Leer-Status prüfen\n    if (appsmith.store['Ventil_Leer_' + btnVal]) {\n      return btnVal;\n    }\n\n    // 3. Alle Einträge für dieses Ventil filtern\n    const filter = (Bewaesserung_Lesen.data || []).filter(row => \n      parseFloat(row.Ventil || 0).toFixed(2) === btnVal\n    );\n\n    // Ventilname formatieren\n    const formattedName = btnVal.startsWith(\"2\") ? \"2. \" + btnVal : btnVal;\n\n    // 4. Tage-Berechnung über unser zentrales Helper-Objekt\n    if (filter.length === 0) return formattedName;\n    \n    // getTageHer gibt \"Heute\", \"1 Tag her\", \"2 Tage her\" etc. zurück\n    const statusText = Data_Helper.getTageHer(filter);\n\n    return `${formattedName} (${statusText})`;\n  })()\n}}",
+  "topRow": 0,
+  "type": "BUTTON_WIDGET",
+  "version": 1,
+  "widgetId": "hzk9v5ttaw",
+  "widgetName": "Ventil_Links"
+}
