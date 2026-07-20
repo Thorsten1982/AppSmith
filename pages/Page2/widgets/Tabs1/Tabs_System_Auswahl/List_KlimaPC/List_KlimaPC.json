@@ -97,7 +97,7 @@
   "itemSpacing": "0",
   "key": "82ppipmxwc",
   "leftColumn": 0,
-  "listData": "{{\n  Bewaesserung_Lesen.data.filter(row => {\n    // 1. Status-Filter: Nur anzeigen, was NICHT \"Fertig\" ist\n    const stat = String(row.Status || \"\").trim();\n    if (stat === \"Fertig\") return false;\n\n    // 2. System-Filter über das Tabs-Widget\n    // Wenn \"Alle\" oder kein Tab gewählt ist, wird dieser Filter übersprungen\n    const gewaehltesSystem = Tabs1.selectedTab;\n    if (!gewaehltesSystem || gewaehltesSystem === \"Alle\") return true;\n\n    // Filtert exakt nach der Nummer/Bezeichnung des gewählten Tabs\n    const zeilenSystem = String(row.System || \"\").trim();\n    return zeilenSystem === gewaehltesSystem.replace(\"System \", \"\").trim();\n  })\n}}",
+  "listData": "{{\n  Bewaesserung_Lesen.data.filter(row => {\n    // 1. Status-Filter: Nur anzeigen, was NICHT \"Fertig\" ist\n    const stat = String(row.Status || \"\").trim();\n    if (stat === \"Fertig\") return false;\n\n    // 2. System-Filter über das Tabs-Widget abgreifen\n    const gewaehltesTab = String(Tabs_System_Auswahl.selectedTab || \"\").trim();\n    \n    // Falls kein Tab ausgewählt ist, zur Sicherheit alles anzeigen\n    if (!gewaehltesTab) return true;\n\n    // Macht aus \"System 1\" -> \"1\"\n    const filterWert = gewaehltesTab.replace(\"System \", \"\").trim();\n\n    // Vergleiche den Wert der Spalte \"System\" als Text mit der Zahl des Tabs\n    const zeilenSystem = String(row.System || \"\").trim();\n    return zeilenSystem === filterWert;\n  })\n}}",
   "mainCanvasId": "zf0ti5otur",
   "mainContainerId": "lw73zlnemx",
   "minWidth": 450,
