@@ -58,7 +58,7 @@
   "renderMode": "CANVAS",
   "resetFormOnClick": false,
   "responsiveBehavior": "hug",
-  "rightColumn": 53,
+  "rightColumn": 55,
   "text": "{{\n  (() => {\n    // 1. Ventil identifizieren\n    const rawVal = String(currentItem.Ventil_Rechts || \"\").trim();\n    const btnVal = parseFloat(rawVal).toFixed(2);\n\n    // 2. Leer-Status prüfen\n    if (appsmith.store['Ventil_Leer_' + btnVal]) {\n      return btnVal;\n    }\n\n    // 3. Alle Einträge für dieses Ventil filtern\n    const filter = (Bewaesserung_Lesen.data || []).filter(row => \n      parseFloat(row.Ventil || 0).toFixed(2) === btnVal\n    );\n\n    // Ventilname formatieren\n    const formattedName = btnVal.startsWith(\"2\") ? \"2. \" + btnVal : btnVal;\n\n    // 4. Tage-Berechnung über unser zentrales Helper-Objekt\n    if (filter.length === 0) return formattedName;\n    \n    // getTageHer gibt \"Heute\", \"1 Tag her\", \"2 Tage her\" etc. zurück\n    const statusText = Data_Helper.getTageHer(filter);\n\n    return `${formattedName} (${statusText})`;\n  })()\n}}",
   "topRow": 0,
   "type": "BUTTON_WIDGET",

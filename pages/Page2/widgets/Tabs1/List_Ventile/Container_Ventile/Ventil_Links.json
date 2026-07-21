@@ -39,7 +39,7 @@
   "isLoading": false,
   "isVisible": "{{ !!currentItem[\"Ventil_Links\"] }}",
   "key": "fq259tbe65",
-  "leftColumn": 12,
+  "leftColumn": 10,
   "minWidth": 120,
   "mobileBottomRow": 7,
   "mobileLeftColumn": 46,
