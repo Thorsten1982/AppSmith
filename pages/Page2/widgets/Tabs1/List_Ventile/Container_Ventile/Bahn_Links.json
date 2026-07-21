@@ -5,9 +5,6 @@
   "boxShadow": "none",
   "dynamicBindingPathList": [
     {
-      "key": "text"
-    },
-    {
       "key": "truncateButtonColor"
     },
     {
@@ -34,9 +31,9 @@
   "fontSize": "1rem",
   "fontStyle": "BOLD",
   "isLoading": false,
-  "isVisible": "{{ currentItem.Weg_Position?.toLowerCase() === \"links\" }}",
+  "isVisible": "{{ String(currentItem.Weg_Position || \"\").toLowerCase().trim() === \"links\" }}",
   "key": "5gdxpyly2f",
-  "leftColumn": 2,
+  "leftColumn": 0,
   "maxDynamicHeight": 9000,
   "minDynamicHeight": 4,
   "minWidth": 450,
@@ -49,9 +46,9 @@
   "parentId": "hf3klqmb2o",
   "renderMode": "CANVAS",
   "responsiveBehavior": "fill",
-  "rightColumn": 9,
+  "rightColumn": 7,
   "shouldTruncate": false,
-  "text": "{{ \"B \" + currentItem.Bahn }}",
+  "text": "{{ String(currentItem.Weg_Position || \"\").toLowerCase().trim() === \"links\" ? \"│  B \" + currentItem.Bahn : \"B \" + currentItem.Bahn + \"  │\" }}",
   "textAlign": "CENTER",
   "textColor": "#231F20",
   "textStyle": "HEADING",

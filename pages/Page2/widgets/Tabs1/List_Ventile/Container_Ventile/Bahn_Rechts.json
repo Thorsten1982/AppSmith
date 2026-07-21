@@ -5,9 +5,6 @@
   "boxShadow": "none",
   "dynamicBindingPathList": [
     {
-      "key": "text"
-    },
-    {
       "key": "truncateButtonColor"
     },
     {
@@ -34,9 +31,9 @@
   "fontSize": "1rem",
   "fontStyle": "BOLD",
   "isLoading": false,
-  "isVisible": "{{ currentItem.Weg_Position?.toLowerCase() === \"rechts\" }}",
+  "isVisible": "{{ String(currentItem.Weg_Position || \"\").toLowerCase().trim() === \"rechts\" }}",
   "key": "5gdxpyly2f",
-  "leftColumn": 54,
+  "leftColumn": 57,
   "maxDynamicHeight": 9000,
   "minDynamicHeight": 4,
   "minWidth": 450,
@@ -49,9 +46,9 @@
   "parentId": "hf3klqmb2o",
   "renderMode": "CANVAS",
   "responsiveBehavior": "fill",
-  "rightColumn": 61,
+  "rightColumn": 64,
   "shouldTruncate": false,
-  "text": "{{ \"B \" + currentItem.Bahn }}",
+  "text": "{{ String(currentItem.Weg_Position || \"\").toLowerCase().trim() === \"links\" ? \"│  B \" + currentItem.Bahn : \"B \" + currentItem.Bahn + \"  │\" }}",
   "textAlign": "CENTER",
   "textColor": "#231F20",
   "textStyle": "HEADING",
@@ -59,6 +56,6 @@
   "truncateButtonColor": "{{appsmith.theme.colors.primaryColor}}",
   "type": "TEXT_WIDGET",
   "version": 1,
-  "widgetId": "xuoe0bpm0b",
+  "widgetId": "6oau0cyq7m",
   "widgetName": "Bahn_Rechts"
 }
