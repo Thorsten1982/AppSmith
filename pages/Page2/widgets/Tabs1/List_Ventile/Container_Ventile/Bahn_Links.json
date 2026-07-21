@@ -46,7 +46,7 @@
   "parentId": "hf3klqmb2o",
   "renderMode": "CANVAS",
   "responsiveBehavior": "fill",
-  "rightColumn": 6,
+  "rightColumn": 7,
   "shouldTruncate": false,
   "text": "{{ \"B \" + currentItem.Bahn }}",
   "textAlign": "CENTER",

@@ -13,7 +13,7 @@ export default {
     const diffTime = today - neuestesDatum;
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     if (diffDays === 0) return "Heute";
-    if (diffDays > 0) return diffDays + " Tage her";
+    if (diffDays > 0) return diffDays + " Tage";
     return "Heute";
   }
 }

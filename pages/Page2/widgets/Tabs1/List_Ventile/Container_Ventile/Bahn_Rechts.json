@@ -33,7 +33,7 @@
   "isLoading": false,
   "isVisible": "{{ String(currentItem.Weg_Position || \"\").toLowerCase().trim() === \"rechts\" }}",
   "key": "5gdxpyly2f",
-  "leftColumn": 58,
+  "leftColumn": 57,
   "maxDynamicHeight": 9000,
   "minDynamicHeight": 4,
   "minWidth": 450,
