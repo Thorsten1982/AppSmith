@@ -14,10 +14,10 @@
       "key": "borderRadius"
     },
     {
-      "key": "text"
+      "key": "isVisible"
     },
     {
-      "key": "isVisible"
+      "key": "text"
     }
   ],
   "dynamicHeight": "FIXED",
@@ -48,7 +48,7 @@
   "responsiveBehavior": "fill",
   "rightColumn": 7,
   "shouldTruncate": false,
-  "text": "{{ String(currentItem.Weg_Position || \"\").toLowerCase().trim() === \"links\" ? \"│  B \" + currentItem.Bahn : \"B \" + currentItem.Bahn + \"  │\" }}",
+  "text": "{{ \"B \" + currentItem.Bahn }}",
   "textAlign": "CENTER",
   "textColor": "#231F20",
   "textStyle": "HEADING",
