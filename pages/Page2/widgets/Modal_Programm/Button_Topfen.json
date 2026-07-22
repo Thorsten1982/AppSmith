@@ -40,7 +40,7 @@
   "mobileRightColumn": 63,
   "mobileTopRow": 18,
   "needsErrorInfo": false,
-  "onClick": "{{\n  storeValue('selectedProg', 'Topfen');\n  showAlert(\"Programm 'Topfen' vorgemerkt.\", \"success\");\n}}",
+  "onClick": "{{\n  storeValue('selectedProg', 'Topfen');\n}}",
   "parentId": "y19f9v8qbz",
   "placement": "CENTER",
   "recaptchaType": "V3",

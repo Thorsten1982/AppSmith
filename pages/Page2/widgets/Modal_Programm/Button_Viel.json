@@ -40,7 +40,7 @@
   "mobileRightColumn": 47,
   "mobileTopRow": 18,
   "needsErrorInfo": false,
-  "onClick": "{{\n  storeValue('selectedProg', 'Viel');\n  showAlert(\"Programm 'Viel' vorgemerkt.\", \"success\");\n}}",
+  "onClick": "{{\n  storeValue('selectedProg', 'Viel');\n}}",
   "parentId": "y19f9v8qbz",
   "placement": "CENTER",
   "recaptchaType": "V3",
