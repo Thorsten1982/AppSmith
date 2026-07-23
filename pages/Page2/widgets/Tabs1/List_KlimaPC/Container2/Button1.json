@@ -3,7 +3,7 @@
   "borderRadius": "{{appsmith.theme.borderRadius.appBorderRadius}}",
   "bottomRow": 4,
   "boxShadow": "none",
-  "buttonColor": "{{appsmith.theme.colors.primaryColor}}",
+  "buttonColor": "{{ \n  (() => {\n    // 1. Sicheres Array holen (fängt ab, wenn Daten noch laden)\n    const daten = Bewaesserung_Lesen.data || [];\n    \n    // 2. Aktuelle Ventilnummer aus der Liste/Tabelle holen\n    const aktivesVentil = String(currentItem.Ventil || currentItem.Ventil_Links || currentItem.Ventil_Rechts || \"\").trim();\n\n    if (!aktivesVentil) return \"#E0E0E0\"; // Grau, falls kein Ventil da ist\n\n    // 3. Eintrag suchen (schaut nach 'Ventil' oder 'ventilName')\n    const e = daten.find(row => {\n      const vVal = String(row.Ventil || row.ventilName || \"\").trim();\n      return vVal === aktivesVentil || parseFloat(vVal) === parseFloat(aktivesVentil);\n    });\n\n    // 4. Wenn kein Eintrag existiert oder kein Programm gesetzt ist -> Grau\n    if (!e || !e.Programm) return \"#E0E0E0\"; \n\n    // 5. Farbe nach Programm zuweisen\n    switch (String(e.Programm).trim()) {\n      case \"Viel\": \n        return \"#1d4ed8\"; // Dunkelblau\n\n      case \"Wenig\": \n        return \"#38bdf8\"; // Hellblau\n\n      case \"Paletten\": \n        return \"#f59e0b\"; // Orange\n\n      case \"Topfen\": \n        return \"#10b981\"; // Grün\n\n      default: \n        return \"#E0E0E0\"; // Grau\n    }\n  })() \n}}",
   "buttonVariant": "PRIMARY",
   "disabledWhenInvalid": false,
   "dynamicBindingPathList": [
@@ -21,6 +21,9 @@
   "dynamicPropertyPathList": [
     {
       "key": "onClick"
+    },
+    {
+      "key": "buttonColor"
     }
   ],
   "dynamicTriggerPathList": [
