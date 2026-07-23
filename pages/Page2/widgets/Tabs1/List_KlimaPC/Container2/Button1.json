@@ -43,7 +43,7 @@
   "mobileRightColumn": 7,
   "mobileTopRow": 0,
   "needsErrorInfo": false,
-  "onClick": "{{\n  Bewaesserung_Update_Status.run({\n    \"realRowIndex\": List_KlimaPC.triggeredItem.rowIndex\n  }).then(() => {\n    Bewaesserung_Lesen.run().then((data) => {\n      // Sortiert die Daten aufsteigend nach der Spalte 'Ventil'\n      data.sort((a, b) => parseFloat(a.Ventil) - parseFloat(b.Ventil));\n      showAlert(\"Erfolgreich gespeichert!\", \"success\");\n    });\n  });\n}}",
+  "onClick": "{{\n  (() => {\n    // 1. Speichern im Hintergrund anstoßen (ohne await / .then)\n    Bewaesserung_Update_Status.run({\n      \"realRowIndex\": List_KlimaPC.triggeredItem.rowIndex\n    });\n\n    // 2. Daten im Hintergrund neu laden (optional, falls nötig)\n    Bewaesserung_Lesen.run();\n  })()\n}}",
   "parentColumnSpace": 22.78125,
   "parentId": "u9fh82k9bp",
   "parentRowSpace": 10,
