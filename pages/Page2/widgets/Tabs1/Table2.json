@@ -196,7 +196,7 @@
   },
   "renderMode": "CANVAS",
   "responsiveBehavior": "fill",
-  "rightColumn": 32,
+  "rightColumn": 64,
   "searchKey": "",
   "tableData": "{{ \n  [...new Set(Stammdaten.data.map(item => item.Haus))].map(h => {\n    const eintrag = Stammdaten.data.find(item => item.Haus === h);\n    return {\n      Haus: \"Haus \" + h,\n      Haus_ID: h,\n      Aktiv: eintrag ? (eintrag.Haus_Aktiv === true || String(eintrag.Haus_Aktiv).toUpperCase() === \"JA\" || eintrag.Haus_Aktiv === 1) : false\n    };\n  })\n}}",
   "textSize": "0.875rem",
