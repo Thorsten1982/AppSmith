@@ -29,7 +29,7 @@
           "data": ""
         },
         "rowObjects": {
-          "data": "{{\n  (() => {\n    return {\n      \"rowIndex\": this.params.realRowIndex,\n      \"Ventil\": appsmith.store.activeVentil,\n      \"Programm\": this.params.programm,\n      \"Modus\": this.params.modus,\n      \"Zeitstempel\": this.params.zeitstempel,\n      \"Status\": \"\"\n    };\n  })()\n}}"
+          "data": "{{\n  (() => {\n    return {\n      \"rowIndex\": this.params.realRowIndex,\n      \"Ventil\": appsmith.store.activeVentil,\n      \"Programm\": this.params.programm,\n      \"Modus\": this.params.modus,\n      \"Zeitstempel\": this.params.zeitstempel,\n      \"Bemerkung\": this.params.bemerkung,\n      \"Status\": \"\"\n    };\n  })()\n}}\n}}"
         },
         "sheetName": {
           "data": "Tabellenblatt2"
