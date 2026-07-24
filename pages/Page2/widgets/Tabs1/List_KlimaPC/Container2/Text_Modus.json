@@ -49,7 +49,7 @@
   "parentId": "u9fh82k9bp",
   "renderMode": "CANVAS",
   "responsiveBehavior": "fill",
-  "rightColumn": 45,
+  "rightColumn": 46,
   "shouldTruncate": false,
   "text": "{{currentItem.Modus }}",
   "textAlign": "CENTER",
