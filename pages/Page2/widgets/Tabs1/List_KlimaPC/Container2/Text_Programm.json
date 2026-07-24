@@ -49,7 +49,7 @@
   "parentId": "u9fh82k9bp",
   "renderMode": "CANVAS",
   "responsiveBehavior": "fill",
-  "rightColumn": 32,
+  "rightColumn": 36,
   "shouldTruncate": false,
   "text": "{{currentItem.Programm }}",
   "textAlign": "CENTER",
