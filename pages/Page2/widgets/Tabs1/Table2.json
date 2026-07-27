@@ -37,7 +37,9 @@
     "Aktiv"
   ],
   "columnUpdatedAt": 1784632374085,
-  "columnWidthMap": {},
+  "columnWidthMap": {
+    "Haus": 244
+  },
   "customIsLoading": false,
   "customIsLoadingValue": "",
   "defaultPageSize": 0,
