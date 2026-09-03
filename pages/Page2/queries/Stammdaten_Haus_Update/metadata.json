@@ -29,7 +29,7 @@
           "data": ""
         },
         "rowObjects": {
-          "data": "{{\n  (() => {\n    const stammdatenArray = Stammdaten.data || [];\n    \n    // Die aktuell geänderte Zeile aus Table2 holen\n    const updatedRow = Table2.updatedRow || Table2.triggeredRow || {};\n    \n    // Die Zeile im Stammdaten-Array anhand von Haus und Bahn suchen\n    // (Oder ein eindeutiges Merkmal wie `Ventil_Links` / `Ventil_Rechts`)\n    const targetIdx = stammdatenArray.findIndex(r => \n      String(r.Haus || \"\").trim() === String(updatedRow.Haus || \"\").trim() &&\n      String(r.Bahn || \"\").trim() === String(updatedRow.Bahn || \"\").trim()\n    );\n\n    if (targetIdx === -1) {\n      return {};\n    }\n\n    // Google Sheets ist 1-basiert und hat 1 Header-Zeile -> Index + 2\n    return {\n      \"rowIndex\": targetIdx + 2,\n      \"Haus_Aktiv\": updatedRow.Aktiv\n    };\n  })()\n}}"
+          "data": "{\n  \"rowIndex\": {{ this.params.rowIndex }},\n  \"Haus_Aktiv\": {{ this.params.neuerStatus }}\n}"
         },
         "sheetName": {
           "data": "Stammdaten"
