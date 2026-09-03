@@ -37,7 +37,7 @@
     "Aktiv",
     "EditActions1"
   ],
-  "columnUpdatedAt": 1788429081555,
+  "columnUpdatedAt": 1788429291089,
   "columnWidthMap": {
     "Haus": 244
   },
@@ -98,7 +98,11 @@
       "key": "primaryColumns.EditActions1.isDiscardDisabled"
     }
   ],
-  "dynamicTriggerPathList": [],
+  "dynamicTriggerPathList": [
+    {
+      "key": "primaryColumns.Aktiv.onCheckChange"
+    }
+  ],
   "enableClientSideSearch": true,
   "endOfData": false,
   "flexVerticalAlignment": "start",
@@ -148,6 +152,7 @@
       "isVisible": true,
       "label": "Aktiv",
       "notation": "standard",
+      "onCheckChange": "{{Stammdaten_Haus_Update.run().then(() => {\n  Stammdaten.run();\n});}}",
       "originalId": "Aktiv",
       "sticky": "",
       "textSize": "0.875rem",
