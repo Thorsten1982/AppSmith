@@ -34,10 +34,9 @@
   "columnOrder": [
     "Haus",
     "Haus_ID",
-    "Aktiv",
-    "EditActions1"
+    "Aktiv"
   ],
-  "columnUpdatedAt": 1788430208011,
+  "columnUpdatedAt": 1788430377591,
   "columnWidthMap": {
     "Haus": 244
   },
@@ -70,32 +69,11 @@
     },
     {
       "key": "primaryColumns.Aktiv.computedValue"
-    },
-    {
-      "key": "primaryColumns.EditActions1.saveButtonColor"
-    },
-    {
-      "key": "primaryColumns.EditActions1.saveBorderRadius"
-    },
-    {
-      "key": "primaryColumns.EditActions1.discardBorderRadius"
-    },
-    {
-      "key": "primaryColumns.EditActions1.isSaveDisabled"
-    },
-    {
-      "key": "primaryColumns.EditActions1.isDiscardDisabled"
     }
   ],
   "dynamicPropertyPathList": [
     {
       "key": "tableData"
-    },
-    {
-      "key": "primaryColumns.EditActions1.isSaveDisabled"
-    },
-    {
-      "key": "primaryColumns.EditActions1.isDiscardDisabled"
     },
     {
       "key": "primaryColumns.Aktiv.onCheckChange"
@@ -110,7 +88,7 @@
   "endOfData": false,
   "flexVerticalAlignment": "start",
   "horizontalAlignment": "LEFT",
-  "inlineEditingSaveOption": "ROW_LEVEL",
+  "inlineEditingSaveOption": "CUSTOM",
   "isLoading": false,
   "isSortable": true,
   "isVisible": true,
@@ -155,53 +133,13 @@
       "isVisible": true,
       "label": "Aktiv",
       "notation": "standard",
-      "onCheckChange": "{{\n  (() => {\n    const stammdatenArray = Stammdaten.data || [];\n    const updatedRow = Table2.updatedRow || Table2.triggeredRow || {};\n    \n    // Passende Zeile im Stammdaten-Array suchen\n    const targetIdx = stammdatenArray.findIndex(r => \n      String(r.Haus || \"\").trim() === String(updatedRow.Haus || \"\").trim() &&\n      String(r.Bahn || \"\").trim() === String(updatedRow.Bahn || \"\").trim()\n    );\n\n    if (targetIdx === -1) {\n      return {};\n    }\n\n    // Google Sheets ist 1-basiert + 1 Header-Zeile -> Index + 2\n    return {\n      \"rowIndex\": targetIdx + 2,\n      \"Haus_Aktiv\": updatedRow.Aktiv\n    };\n  })()\n}}",
+      "onCheckChange": "{{\n  (async () => {\n    const hausID = String(currentRow?.Haus_ID || Table2.updatedRow?.Haus_ID || Table2.triggeredRow?.Haus_ID || \"\").trim();\n    const neuerStatus = Table2.updatedRow?.Aktiv ?? currentRow?.Aktiv;\n    const statusString = neuerStatus ? \"TRUE\" : \"FALSE\";\n\n    if (!hausID) return;\n\n    const stammdatenArray = Stammdaten.data || [];\n\n    // Array aus allen zu aktualisierenden Zeilen mit ihrem jeweiligen rowIndex bauen\n    const rowsToUpdate = [];\n    stammdatenArray.forEach((r, i) => {\n      if (String(r.Haus || \"\").trim() === hausID) {\n        rowsToUpdate.push({\n          \"rowIndex\": i,\n          \"Haus_Aktiv\": statusString\n        });\n      }\n    });\n\n    if (rowsToUpdate.length === 0) return;\n\n    // Nur ein einziger API-Aufruf an Google Sheets für alle Zeilen!\n    await Stammdaten_Haus_Update.run({\n      rowsToUpdate: rowsToUpdate\n    });\n\n    await Stammdaten.run();\n    showAlert(`Haus ${hausID} aktualisiert.`, \"success\");\n  })()\n}}",
       "originalId": "Aktiv",
       "sticky": "",
       "textSize": "0.875rem",
       "thousandSeparator": true,
       "validation": {},
       "verticalAlignment": "CENTER",
-      "width": 150
-    },
-    "EditActions1": {
-      "alias": "EditActions1",
-      "allowCellWrapping": false,
-      "allowSameOptionsInNewRow": true,
-      "buttonStyle": "rgb(3, 179, 101)",
-      "columnType": "editActions",
-      "computedValue": "",
-      "currencyCode": "USD",
-      "decimals": 0,
-      "discardActionLabel": "Discard",
-      "discardBorderRadius": "{{Table2.processedTableData.map((currentRow, currentIndex) => ( (appsmith.theme.borderRadius.appBorderRadius)))}}",
-      "discardButtonColor": "#F22B2B",
-      "discardButtonVariant": "TERTIARY",
-      "discardIconAlign": "left",
-      "enableFilter": true,
-      "enableSort": true,
-      "id": "EditActions1",
-      "index": 3,
-      "isCellEditable": false,
-      "isCellVisible": true,
-      "isDerived": true,
-      "isDisabled": false,
-      "isDiscardDisabled": "{{Table2.processedTableData.map((currentRow, currentIndex) => ( !Table2.updatedRowIndices.includes(currentIndex)))}}",
-      "isDiscardVisible": true,
-      "isEditable": false,
-      "isSaveDisabled": "{{Table2.processedTableData.map((currentRow, currentIndex) => ( !Table2.updatedRowIndices.includes(currentIndex)))}}",
-      "isSaveVisible": true,
-      "isVisible": false,
-      "label": "Save / Discard",
-      "notation": "standard",
-      "originalId": "EditActions1",
-      "saveActionLabel": "Save",
-      "saveBorderRadius": "{{Table2.processedTableData.map((currentRow, currentIndex) => ( (appsmith.theme.borderRadius.appBorderRadius)))}}",
-      "saveButtonColor": "{{Table2.processedTableData.map((currentRow, currentIndex) => ( (appsmith.theme.colors.primaryColor)))}}",
-      "saveIconAlign": "left",
-      "sticky": "right",
-      "thousandSeparator": true,
-      "validation": {},
       "width": 150
     },
     "Haus": {

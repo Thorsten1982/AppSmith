@@ -8,7 +8,7 @@
       "encodeParamsToggle": true,
       "formData": {
         "command": {
-          "data": "UPDATE_ONE"
+          "data": "UPDATE_MANY"
         },
         "entityType": {
           "data": "ROWS"
@@ -29,7 +29,7 @@
           "data": ""
         },
         "rowObjects": {
-          "data": "{\n  \"rowIndex\": {{ this.params.rowIndex }},\n  \"Haus_Aktiv\": {{ this.params.neuerStatus }}\n}"
+          "data": "{{\n  this.params.rowsToUpdate\n}}"
         },
         "sheetName": {
           "data": "Stammdaten"
