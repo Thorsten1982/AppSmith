@@ -29,7 +29,7 @@
           "data": ""
         },
         "rowObjects": {
-          "data": "{\n  \"Ventil\": \"{{ String(this.params.ventilName || '') }}\",\n  \"Programm\": \"{{this.params.programm}}\",\n  \"Modus\": \"{{this.params.modus}}\",\n  \"System\": \"{{ (this.params.stammdaten || []).find(s => String(s.Ventil_Links).trim() === String(this.params.ventilName).trim() || String(s.Ventil_Rechts).trim() === String(this.params.ventilName).trim())?.System || 'Nicht gefunden' }}\",\n  \"Zeitstempel\": \"{{ this.params.zeitstempel || moment().format('DD.MM.YYYY HH:mm') }}\",\n  \"Bemerkung\": \"{{this.params.bemerkung || ''}}\",\n  \"Status\": \"\"\n}"
+          "data": "{\n  \"Ventil\": \"{{ String(this.params.ventilName || '') }}\",\n  \"Programm\": \"{{this.params.programm}}\",\n  \"Modus\": \"{{this.params.modus}}\",\n  \"System\": \"{{ \n    (() => {\n      const stammdaten = this.params.stammdaten || [];\n      const vName = String(this.params.ventilName || '').trim();\n      const fVal = parseFloat(vName);\n\n      const found = stammdaten.find(s => {\n        const l = String(s.Ventil_Links || '').trim();\n        const r = String(s.Ventil_Rechts || '').trim();\n        return l === vName || r === vName || \n               (!isNaN(fVal) && (parseFloat(l) === fVal || parseFloat(r) === fVal));\n      });\n      return found ? found.System : 'Nicht gefunden';\n    })() \n  }}\",\n  \"Zeitstempel\": \"{{ this.params.zeitstempel || moment().format('DD.MM.YYYY HH:mm') }}\",\n  \"Bemerkung\": \"{{this.params.bemerkung || ''}}\",\n  \"Status\": \"\"\n}"
         },
         "sheetName": {
           "data": "Tabellenblatt2"

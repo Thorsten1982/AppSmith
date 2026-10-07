@@ -11,10 +11,10 @@
       "key": "isVisible"
     },
     {
-      "key": "text"
+      "key": "buttonColor"
     },
     {
-      "key": "buttonColor"
+      "key": "text"
     }
   ],
   "dynamicHeight": "FIXED",
@@ -56,7 +56,7 @@
   "resetFormOnClick": false,
   "responsiveBehavior": "hug",
   "rightColumn": 33,
-  "text": "{{\n  (() => {\n    // 1. Linkes Ventil identifizieren\n    const rawVal = String(currentItem.Ventil_Links || \"\").trim();\n    if (!rawVal) return \"\";\n    \n    const btnVal = parseFloat(rawVal).toFixed(2);\n\n    // 2. Leer-Status prüfen (Stammdaten & Store)\n    const isLeer = currentItem.Status_Leer_Links === true || String(currentItem.Status_Leer_Links).toUpperCase() === \"TRUE\";\n    if (appsmith.store['Ventil_Leer_' + btnVal] || isLeer) {\n      return btnVal;\n    }\n\n    // 3. Alle Einträge für dieses Ventil filtern (Store bevorzugt, Fallback Query)\n    const bewaesserungQuelle = appsmith.store.lokaleBewaesserungData || Bewaesserung_Lesen.data || [];\n    const filter = bewaesserungQuelle.filter(row => \n      parseFloat(row.Ventil || 0).toFixed(2) === btnVal\n    );\n\n    // Ventilname formatieren\n    const formattedName = btnVal.startsWith(\"2\") ? \"2. \" + btnVal : btnVal;\n\n    // 4. Tage-Berechnung über das zentrale Helper-Objekt\n    if (filter.length === 0) return formattedName;\n    \n    const statusText = Data_Helper.getTageHer(filter);\n\n    return `${formattedName} (${statusText})`;\n  })()\n}}",
+  "text": "{{ Data_Helper.formatiereVentilText(currentItem, 'Ventil_Links', 'Status_Leer_Links') }}",
   "topRow": 0,
   "type": "BUTTON_WIDGET",
   "version": 1,

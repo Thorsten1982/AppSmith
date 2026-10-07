@@ -1,32 +1,29 @@
 export default {
+  // 1. Berechnet die vergangenen Tage seit dem letzten Eintrag
   getTageHer: (eintraege) => {
     if (!eintraege || eintraege.length === 0) return "Nie";
 
-    // 1. Alle Datumsangaben sicher parsen (auch unvollständige Zeitstempel abfangen)
     const gueltigeDaten = eintraege.map(e => {
       if (!e.Zeitstempel) return null;
       
       const teile = String(e.Zeitstempel).trim().split(' ');
-      const datumTeil = teile[0]; // z.B. "07.10.2026"
-      const zeitTeil = teile[1] || "00:00"; // Fallback, falls Uhrzeit fehlt
+      const datumTeil = teile[0]; 
+      const zeitTeil = teile[1] || "00:00"; 
 
       const dBits = datumTeil.split('.');
       if (dBits.length < 3) return null;
 
-      // Erstellt ein gültiges ISO-Format (YYYY-MM-DDTHH:mm:00)
       const isoFormat = `${dBits[2]}-${dBits[1].padStart(2, '0')}-${dBits[0].padStart(2, '0')}T${zeitTeil}:00`;
       const parsedDate = new Date(isoFormat);
 
       return isNaN(parsedDate.getTime()) ? null : parsedDate;
-    }).filter(d => d !== null); // Ungültige Datumsangaben aussortieren
+    }).filter(d => d !== null);
 
     if (gueltigeDaten.length === 0) return "Nie";
 
-    // 2. Nach Neuestem Datum sortieren
     gueltigeDaten.sort((a, b) => b - a);
     const neuestesDatum = gueltigeDaten[0];
 
-    // 3. Tagesdifferenz berechnen
     const heute = new Date();
     heute.setHours(0, 0, 0, 0);
 
@@ -41,13 +38,13 @@ export default {
     return `${diffDays} Tage`;
   },
 
+  // 2. Ermittelt die Button-Farbe je nach Status
   ermittleVentilFarbe: (currentItem, ventSpalte, leerSpalte) => {
-    const _reRenderTrigger = appsmith.store.lastUpdate;
     const rawVal = String(currentItem[ventSpalte] || "").trim();
-    if (!rawVal) return '#3b82f6'; // Standard Blau
+    if (!rawVal) return '#3b82f6';
     
     const isLeerCurrent = currentItem[leerSpalte] === true || String(currentItem[leerSpalte]).trim().toUpperCase() === "TRUE";
-    if (isLeerCurrent) return '#e5e7eb'; // Grau
+    if (isLeerCurrent) return '#e5e7eb';
     
     const bewaesserungQuelle = appsmith.store.lokaleBewaesserungData || Bewaesserung_Lesen.data || [];
     const btnValFloat = parseFloat(rawVal);
@@ -88,14 +85,69 @@ export default {
           const status = String(latest.Status || "").toLowerCase().trim();
           const modus = String(latest.Modus || "").toLowerCase().trim();
 
-          if (status.includes("fertig")) return '#22c55e'; // GRÜN
-          if (modus.includes("jetzt"))  return '#991b1b'; // DUNKELROT
-          if (modus.includes("später")) return '#f97316'; // ORANGE
-          if (modus.includes("zeit"))   return '#f87171'; // HELLROT
+          if (status.includes("fertig")) return '#22c55e'; 
+          if (modus.includes("jetzt"))  return '#991b1b'; 
+          if (modus.includes("später")) return '#f97316'; 
+          if (modus.includes("zeit"))   return '#f87171'; 
         }
       }
     }
     
-    return '#3b82f6'; // Standard Blau
+    return '#3b82f6';
+  },
+
+  // 3. Formatiert den Text auf den Ventil-Buttons
+  formatiereVentilText: (currentItem, ventSpalte, leerSpalte) => {
+    const rawVal = String(currentItem[ventSpalte] || "").trim();
+    if (!rawVal) return "";
+    
+    const btnVal = parseFloat(rawVal).toFixed(2);
+
+    const isLeer = currentItem[leerSpalte] === true || String(currentItem[leerSpalte]).toUpperCase() === "TRUE";
+    if (appsmith.store['Ventil_Leer_' + btnVal] || isLeer) {
+      return btnVal;
+    }
+
+    const bewaesserungQuelle = appsmith.store.lokaleBewaesserungData || Bewaesserung_Lesen.data || [];
+    const filter = bewaesserungQuelle.filter(row => 
+      parseFloat(row.Ventil || 0).toFixed(2) === btnVal
+    );
+
+    const formattedName = btnVal.startsWith("2") ? "2. " + btnVal : btnVal;
+
+    if (filter.length === 0) return formattedName;
+    
+    const statusText = Data_Helper.getTageHer(filter);
+    return `${formattedName} (${statusText})`;
+  },
+
+  // 4. Speichert den Eintrag im lokalen Store (mit Re-Render-Trigger)
+  speichereEintrag: async (activeVentil, modusWert, programm, bemerkung) => {
+    const jetzigerZeitstempel = moment().format('DD.MM.YYYY HH:mm');
+    const daten = [...(appsmith.store.lokaleBewaesserungData || Bewaesserung_Lesen.data || [])];
+
+    let existIndex = daten.findIndex(r => {
+      const match = String(r.Ventil).trim() === String(activeVentil).trim();
+      const unfertig = String(r.Status || "").trim().toLowerCase() !== "fertig";
+      return match && unfertig;
+    });
+
+    const neuerEintrag = {
+      Ventil: activeVentil,
+      Modus: modusWert,
+      Programm: programm || "",
+      Zeitstempel: jetzigerZeitstempel,
+      Bemerkung: bemerkung || "",
+      Status: 'Offen'
+    };
+
+    if (existIndex !== -1) {
+      daten[existIndex] = { ...daten[existIndex], ...neuerEintrag };
+    } else {
+      daten.unshift(neuerEintrag);
+    }
+
+    await storeValue('lokaleBewaesserungData', [...daten]);
+    await storeValue('lastUpdate', Date.now());
   }
 }
