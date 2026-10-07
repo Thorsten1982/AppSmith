@@ -220,13 +220,20 @@ export default {
     return ergebnis;
   },
 
-  // 6. Entfernt den Eintrag sofort aus dem Store (Optimistic UI ohne Neuladen)
+  // 6. Setzt den Status im Store auf 'Fertig' (Optimistic UI ohne Neuladen)
   entferneLokalenEintrag: async (item, aktuelleDaten) => {
-    const neueDaten = (aktuelleDaten || []).filter(r => 
-      String(r.echterIndex) !== String(item.echterIndex) && 
-      String(r.rowIndex) !== String(item.rowIndex) &&
-      !(String(r.Ventil).trim() === String(item.Ventil).trim() && String(r.Modus).trim() === String(item.Modus).trim())
-    );
+    const neueDaten = (aktuelleDaten || []).map(r => {
+      const match = 
+        (item.echterIndex !== undefined && String(r.echterIndex) === String(item.echterIndex)) || 
+        (item.rowIndex !== undefined && String(r.rowIndex) === String(item.rowIndex)) ||
+        (String(r.Ventil).trim() === String(item.Ventil).trim() && String(r.Modus).trim() === String(item.Modus).trim());
+
+      if (match) {
+        return { ...r, Status: 'Fertig' };
+      }
+      return r;
+    });
+
     await storeValue('lokaleBewaesserungData', neueDaten);
     await storeValue('lastUpdate', Date.now());
     return item.echterIndex !== undefined ? item.echterIndex : item.rowIndex;
