@@ -149,5 +149,86 @@ export default {
 
     await storeValue('lokaleBewaesserungData', [...daten]);
     await storeValue('lastUpdate', Date.now());
+  },
+
+  // 5. Verarbeitet, formatiert und gruppiert die KlimaPC-Daten zentral
+  holeKlimaPCData: (rawDaten, stammdaten, gewaehltesTab) => {
+    const formatVentil = (val) => {
+      if (val === undefined || val === null || val === "") return "";
+      const num = parseFloat(String(val).replace(",", "."));
+      return isNaN(num) ? "" : num.toFixed(2);
+    };
+
+    const ventilToBahnMap = {};
+    (stammdaten || []).forEach(stamm => {
+      const bahn = stamm.Bahn !== undefined && stamm.Bahn !== "" ? String(stamm.Bahn).trim() : "";
+      const vLinks = formatVentil(stamm.Ventil_Links);
+      if (vLinks) ventilToBahnMap[vLinks] = bahn;
+      const vRechts = formatVentil(stamm.Ventil_Rechts);
+      if (vRechts) ventilToBahnMap[vRechts] = bahn;
+    });
+
+    const gefiltert = (rawDaten || [])
+      .map((row, index) => {
+        const ventilFormatted = formatVentil(row.Ventil);
+        const geholteBahn = ventilToBahnMap[ventilFormatted] || row.Bahn || "";
+
+        return {
+          ...row,
+          Ventil: ventilFormatted || row.Ventil,
+          echterIndex: row.rowIndex !== undefined ? row.rowIndex : (index + 2),
+          isHeader: false,
+          bahn: geholteBahn,
+          bahnUndVentil: geholteBahn ? `Bahn ${geholteBahn} | ${ventilFormatted}` : ventilFormatted
+        };
+      })
+      .filter(row => {
+        const stat = String(row.Status || "").trim();
+        if (stat === "Fertig") return false;
+
+        if (!gewaehltesTab || gewaehltesTab === "undefined" || gewaehltesTab === "" || gewaehltesTab === "Alle") return true;
+
+        const match = gewaehltesTab.match(/\d+/);
+        const filterWert = match ? match[0] : gewaehltesTab;
+        const zeilenSystem = String(row.System || "").trim();
+        return zeilenSystem === filterWert;
+      })
+      .sort((a, b) => {
+        const valA = parseFloat(String(a.Ventil).replace(",", ".")) || 0;
+        const valB = parseFloat(String(b.Ventil).replace(",", ".")) || 0;
+        return valA - valB;
+      });
+
+    const jetzt = gefiltert.filter(r => String(r.Modus || "").trim().toLowerCase() === 'jetzt');
+    const zeit = gefiltert.filter(r => String(r.Modus || "").trim().toLowerCase() === 'zeit');
+    const spaeter = gefiltert.filter(r => String(r.Modus || "").trim().toLowerCase() === 'später');
+
+    const ergebnis = [];
+    if (jetzt.length > 0) {
+      ergebnis.push({ isHeader: true, titel: "⚡ JETZT" });
+      ergebnis.push(...jetzt);
+    }
+    if (zeit.length > 0) {
+      ergebnis.push({ isHeader: true, titel: "⏰ ZEIT" });
+      ergebnis.push(...zeit);
+    }
+    if (spaeter.length > 0) {
+      ergebnis.push({ isHeader: true, titel: "📅 SPÄTER" });
+      ergebnis.push(...spaeter);
+    }
+
+    return ergebnis;
+  },
+
+  // 6. Entfernt den Eintrag sofort aus dem Store (Optimistic UI ohne Neuladen)
+  entferneLokalenEintrag: async (item, aktuelleDaten) => {
+    const neueDaten = (aktuelleDaten || []).filter(r => 
+      String(r.echterIndex) !== String(item.echterIndex) && 
+      String(r.rowIndex) !== String(item.rowIndex) &&
+      !(String(r.Ventil).trim() === String(item.Ventil).trim() && String(r.Modus).trim() === String(item.Modus).trim())
+    );
+    await storeValue('lokaleBewaesserungData', neueDaten);
+    await storeValue('lastUpdate', Date.now());
+    return item.echterIndex !== undefined ? item.echterIndex : item.rowIndex;
   }
 }
