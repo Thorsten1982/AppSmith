@@ -1,0 +1,65 @@
+{
+  "animateLoading": true,
+  "borderRadius": "0px",
+  "bottomRow": 4,
+  "boxShadow": "none",
+  "buttonColor": "{{\n  (() => {\n    // Re-Render Trigger einbinden:\n    const _reRenderTrigger = appsmith.store.lastUpdate;\n\n    const ventSpalte = \"Ventil_Links\"; \n    const leerSpalte = \"Status_Leer_Links\";\n    \n    const rawVal = String(currentItem[ventSpalte] || \"\").trim();\n    if (!rawVal) return '#3b82f6'; // Standard Blau\n    \n    // 1. Leer-Status prüfen -> Grau\n    const isLeerCurrent = currentItem[leerSpalte] === true || String(currentItem[leerSpalte]).trim().toUpperCase() === \"TRUE\";\n    if (isLeerCurrent) return '#e5e7eb';\n    \n    // 2. Bewässerungsdaten aus dem Store/Query lesen\n    const bewaesserungQuelle = appsmith.store.lokaleBewaesserungData || Bewaesserung_Lesen.data || [];\n    const btnValFloat = parseFloat(rawVal);\n\n    const alleEintraege = bewaesserungQuelle.filter(row => {\n      const vRaw = String(row.Ventil || \"\").trim();\n      if (!vRaw) return false;\n      const vFloat = parseFloat(vRaw);\n      return vRaw === rawVal || (!isNaN(vFloat) && !isNaN(btnValFloat) && vFloat.toFixed(2) === btnValFloat.toFixed(2));\n    });\n\n    if (alleEintraege.length > 0) {\n      const parseGermanTimestamp = (str) => {\n        if (!str) return 0;\n        const teile = String(str).trim().split(' ');\n        const d = (teile[0] || '').split('.');\n        if (d.length < 3) return 0;\n        const t = (teile[1] || '00:00').split(':');\n        return new Date(Number(d[2]), Number(d[1]) - 1, Number(d[0]), Number(t[0] || 0), Number(t[1] || 0)).getTime();\n      };\n\n      alleEintraege.sort((a, b) => parseGermanTimestamp(b.Zeitstempel) - parseGermanTimestamp(a.Zeitstempel));\n\n      const latest = alleEintraege[0];\n      const latestTime = parseGermanTimestamp(latest.Zeitstempel);\n\n      if (latestTime > 0) {\n        const dLatest = new Date(latestTime);\n        const heute = new Date();\n\n        const istHeute = (\n          dLatest.getDate() === heute.getDate() &&\n          dLatest.getMonth() === heute.getMonth() &&\n          dLatest.getFullYear() === heute.getFullYear()\n        );\n\n        if (istHeute) {\n          const status = String(latest.Status || \"\").toLowerCase().trim();\n          const modus = String(latest.Modus || \"\").toLowerCase().trim();\n\n          if (status.includes(\"fertig\")) return '#22c55e'; // GRÜN\n          if (modus.includes(\"jetzt\"))  return '#991b1b'; // DUNKELROT\n          if (modus.includes(\"später\")) return '#f97316'; // ORANGE\n          if (modus.includes(\"zeit\"))   return '#f87171'; // HELLROT\n        }\n      }\n    }\n    \n    return '#3b82f6'; // Standard Blau\n  })()\n}}",
+  "buttonVariant": "PRIMARY",
+  "disabledWhenInvalid": false,
+  "dynamicBindingPathList": [
+    {
+      "key": "isVisible"
+    },
+    {
+      "key": "text"
+    },
+    {
+      "key": "buttonColor"
+    }
+  ],
+  "dynamicHeight": "FIXED",
+  "dynamicPropertyPathList": [
+    {
+      "key": "onClick"
+    },
+    {
+      "key": "buttonColor"
+    },
+    {
+      "key": "isVisible"
+    }
+  ],
+  "dynamicTriggerPathList": [
+    {
+      "key": "onClick"
+    }
+  ],
+  "isDefaultClickDisabled": true,
+  "isDisabled": false,
+  "isLoading": false,
+  "isVisible": "{{ !!currentItem[\"Ventil_Links\"] }}",
+  "key": "fq259tbe65",
+  "leftColumn": 10,
+  "minWidth": 120,
+  "mobileBottomRow": 7,
+  "mobileLeftColumn": 46,
+  "mobileRightColumn": 62,
+  "mobileTopRow": 3,
+  "needsErrorInfo": false,
+  "onClick": "{{ \n  storeValue('activeVentil', currentItem.Ventil_Links); \n  storeValue('selectedProg', ''); // Setzt das Programm beim Öffnen auf \"leer\" zurück\n  showModal('Modal_Programm'); \n}}",
+  "parentColumnSpace": 5.99169921875,
+  "parentId": "hf3klqmb2o",
+  "parentRowSpace": 10,
+  "placement": "CENTER",
+  "recaptchaType": "V3",
+  "renderMode": "CANVAS",
+  "resetFormOnClick": false,
+  "responsiveBehavior": "hug",
+  "rightColumn": 33,
+  "text": "{{\n  (() => {\n    // 1. Linkes Ventil identifizieren\n    const rawVal = String(currentItem.Ventil_Links || \"\").trim();\n    if (!rawVal) return \"\";\n    \n    const btnVal = parseFloat(rawVal).toFixed(2);\n\n    // 2. Leer-Status prüfen (Stammdaten & Store)\n    const isLeer = currentItem.Status_Leer_Links === true || String(currentItem.Status_Leer_Links).toUpperCase() === \"TRUE\";\n    if (appsmith.store['Ventil_Leer_' + btnVal] || isLeer) {\n      return btnVal;\n    }\n\n    // 3. Alle Einträge für dieses Ventil filtern (Store bevorzugt, Fallback Query)\n    const bewaesserungQuelle = appsmith.store.lokaleBewaesserungData || Bewaesserung_Lesen.data || [];\n    const filter = bewaesserungQuelle.filter(row => \n      parseFloat(row.Ventil || 0).toFixed(2) === btnVal\n    );\n\n    // Ventilname formatieren\n    const formattedName = btnVal.startsWith(\"2\") ? \"2. \" + btnVal : btnVal;\n\n    // 4. Tage-Berechnung über das zentrale Helper-Objekt\n    if (filter.length === 0) return formattedName;\n    \n    const statusText = Data_Helper.getTageHer(filter);\n\n    return `${formattedName} (${statusText})`;\n  })()\n}}",
+  "topRow": 0,
+  "type": "BUTTON_WIDGET",
+  "version": 1,
+  "widgetId": "hzk9v5ttaw",
+  "widgetName": "Ventil_Links"
+}

@@ -1,0 +1,54 @@
+{
+  "animateLoading": true,
+  "borderRadius": "{{appsmith.theme.borderRadius.appBorderRadius}}",
+  "bottomRow": 5,
+  "boxShadow": "none",
+  "buttonColor": "{{appsmith.theme.colors.primaryColor}}",
+  "buttonStyle": "PRIMARY_BUTTON",
+  "buttonVariant": "PRIMARY",
+  "disabledWhenInvalid": false,
+  "dynamicBindingPathList": [
+    {
+      "key": "buttonColor"
+    },
+    {
+      "key": "borderRadius"
+    }
+  ],
+  "dynamicPropertyPathList": [
+    {
+      "key": "onClick"
+    }
+  ],
+  "dynamicTriggerPathList": [
+    {
+      "key": "onClick"
+    }
+  ],
+  "isDefaultClickDisabled": true,
+  "isDisabled": false,
+  "isLoading": false,
+  "isVisible": true,
+  "key": "wjiiv6g614",
+  "leftColumn": 37,
+  "minWidth": 120,
+  "mobileBottomRow": 22,
+  "mobileLeftColumn": 47,
+  "mobileRightColumn": 63,
+  "mobileTopRow": 18,
+  "needsErrorInfo": false,
+  "onClick": "{{\n  (async () => {\n    const rawVentil = String(appsmith.store.activeVentil || \"\").trim();\n    if (!rawVentil) {\n      showAlert(\"Fehler: Kein aktives Ventil ausgewählt!\", \"error\");\n      return;\n    }\n\n    // Formate abfangen und harmonisieren\n    const parsedActive = parseFloat(rawVentil.replace(\",\", \".\"));\n    const storeVentilFormatted = !isNaN(parsedActive) ? parsedActive.toFixed(2) : rawVentil;\n\n    // 1. Zeilen-Index in den Stammdaten suchen\n    const stammdatenList = [...(appsmith.store.lokaleStammdaten || Stammdaten.data || [])];\n\n    const foundIndex = stammdatenList.findIndex(r => {\n      const vL = String(r.Ventil_Links || \"\").trim().replace(\",\", \".\");\n      const vR = String(r.Ventil_Rechts || \"\").trim().replace(\",\", \".\");\n\n      const matchL = vL === storeVentilFormatted || (!isNaN(parseFloat(vL)) && parseFloat(vL).toFixed(2) === storeVentilFormatted);\n      const matchR = vR === storeVentilFormatted || (!isNaN(parseFloat(vR)) && parseFloat(vR).toFixed(2) === storeVentilFormatted);\n\n      return matchL || matchR;\n    });\n\n    if (foundIndex === -1) {\n      showAlert(\"Fehler: Ventil wurde nicht in den Stammdaten gefunden!\", \"error\");\n      return;\n    }\n\n    // 2. Seite identifizieren (Links oder Rechts)\n    const row = { ...stammdatenList[foundIndex] };\n    const vL = String(row.Ventil_Links || \"\").trim().replace(\",\", \".\");\n    const isLeft = vL === storeVentilFormatted || (!isNaN(parseFloat(vL)) && parseFloat(vL).toFixed(2) === storeVentilFormatted);\n\n    // 3. Lokalen Stammdaten-Store direkt aktualisieren\n    if (isLeft) {\n      row.Status_Leer_Links = true;\n    } else {\n      row.Status_Leer_Rechts = true;\n    }\n    stammdatenList[foundIndex] = row;\n\n    // 4. Stores setzen & Re-Render auslösen\n    await storeValue('lokaleStammdaten', [...stammdatenList]);\n    await storeValue('Ventil_Leer_' + storeVentilFormatted, true);\n    await storeValue('lastUpdate', Date.now());\n\n    // Modal sofort schließen\n    closeModal('Modal_Programm');\n\n    // 5. Im Hintergrund an Google Sheets senden (OHNE Refetch/Reload!)\n    try {\n      await Stammdaten_Update.run({\n        targetIndex: foundIndex,\n        neuerStatus: true,\n        isLeft: isLeft\n      });\n\n    } catch (e) {\n      showAlert(\"Fehler beim Updaten: \" + e.message, \"error\");\n    }\n  })()\n}}",
+  "parentId": "y19f9v8qbz",
+  "placement": "CENTER",
+  "recaptchaType": "V3",
+  "renderMode": "CANVAS",
+  "resetFormOnClick": false,
+  "responsiveBehavior": "hug",
+  "rightColumn": 53,
+  "text": "Nicht belegt\n",
+  "topRow": 1,
+  "type": "BUTTON_WIDGET",
+  "version": 1,
+  "widgetId": "6c1gq8cb2p",
+  "widgetName": "Button_Leer"
+}

@@ -1,0 +1,68 @@
+{
+  "animateLoading": true,
+  "borderRadius": "{{appsmith.theme.borderRadius.appBorderRadius}}",
+  "bottomRow": 4,
+  "boxShadow": "none",
+  "buttonColor": "{{\n  (() => {\n    const item = typeof currentItem !== 'undefined' ? currentItem : null;\n    if (!item || item.isHeader) return \"#E0E0E0\";\n\n    const daten = Bewaesserung_Lesen.data || [];\n    const rawVentil = item.Ventil ?? item.Ventil_Links ?? item.Ventil_Rechts ?? \"\";\n    const aktivesVentil = String(rawVentil).trim();\n\n    if (!aktivesVentil) return \"#E0E0E0\";\n\n    const e = daten.findLast(row => {\n      const vVal = String(row.Ventil || row.ventilName || \"\").trim();\n      const status = String(row.Status || \"\").trim().toLowerCase();\n      const matchesVentil = (vVal === aktivesVentil) || (!isNaN(parseFloat(vVal)) && !isNaN(parseFloat(aktivesVentil)) && parseFloat(vVal) === parseFloat(aktivesVentil));\n      return matchesVentil && status !== \"fertig\";\n    });\n\n    if (!e || !e.Programm) return \"#E0E0E0\"; \n\n    const prog = String(e.Programm).trim().toLowerCase();\n    switch (prog) {\n      case \"viel\": return \"#1d4ed8\";\n      case \"wenig\": return \"#38bdf8\";\n      case \"paletten\": return \"#f59e0b\";\n      case \"topfen\": return \"#10b981\";\n      default: return \"#E0E0E0\";\n    }\n  })()\n}}",
+  "buttonVariant": "PRIMARY",
+  "disabledWhenInvalid": false,
+  "dynamicBindingPathList": [
+    {
+      "key": "buttonColor"
+    },
+    {
+      "key": "borderRadius"
+    },
+    {
+      "key": "isVisible"
+    },
+    {
+      "key": "text"
+    }
+  ],
+  "dynamicHeight": "FIXED",
+  "dynamicPropertyPathList": [
+    {
+      "key": "onClick"
+    },
+    {
+      "key": "buttonColor"
+    },
+    {
+      "key": "isVisible"
+    }
+  ],
+  "dynamicTriggerPathList": [
+    {
+      "key": "onClick"
+    }
+  ],
+  "isDefaultClickDisabled": true,
+  "isDisabled": false,
+  "isLoading": false,
+  "isVisible": "{{ currentItem.isHeader !== true }}",
+  "key": "wjiiv6g614",
+  "leftColumn": 12,
+  "minWidth": 120,
+  "mobileBottomRow": 4,
+  "mobileLeftColumn": 0,
+  "mobileRightColumn": 7,
+  "mobileTopRow": 0,
+  "needsErrorInfo": false,
+  "onClick": "{{\n  (async () => {\n    // 1. Warten, bis der Status im Sheet auf \"fertig\" gesetzt wurde\n    await Bewaesserung_Update_Status.run({\n      \"realRowIndex\": List_KlimaPC.triggeredItem.rowIndex\n    });\n\n    // 2. JETZT die frischen Daten laden (das Ventil verschwindet sofort!)\n    await Bewaesserung_Lesen.run();\n  })()\n}}",
+  "parentColumnSpace": 22.78125,
+  "parentId": "u9fh82k9bp",
+  "parentRowSpace": 10,
+  "placement": "CENTER",
+  "recaptchaType": "V3",
+  "renderMode": "CANVAS",
+  "resetFormOnClick": false,
+  "responsiveBehavior": "hug",
+  "rightColumn": 25,
+  "text": "{{\n  (() => {\n    const item = typeof currentItem !== 'undefined' ? currentItem : null;\n    if (!item) return \"\";\n    if (item.isHeader) return item.titel || \"\";\n    return item.bahn ? \"Bahn \" + item.bahn + \"     •      \" + item.Ventil : item.Ventil || \"\";\n  })()\n}}",
+  "topRow": 0,
+  "type": "BUTTON_WIDGET",
+  "version": 1,
+  "widgetId": "wp4utg1hxr",
+  "widgetName": "Button1"
+}
