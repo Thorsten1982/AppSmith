@@ -49,7 +49,7 @@
   "mobileRightColumn": 7,
   "mobileTopRow": 0,
   "needsErrorInfo": false,
-  "onClick": "{{\n  (async () => {\n    // 1. Warten, bis der Status im Sheet auf \"fertig\" gesetzt wurde\n    await Bewaesserung_Update_Status.run({\n      \"realRowIndex\": List_KlimaPC.triggeredItem.rowIndex\n    });\n\n    // 2. JETZT die frischen Daten laden (das Ventil verschwindet sofort!)\n    await Bewaesserung_Lesen.run();\n  })()\n}}",
+  "onClick": "{{\n  (async () => {\n    const item = List_KlimaPC.triggeredItem;\n    if (!item) return;\n\n    // 1. Lokalen Store SOFORT aktualisieren (kein Warten, kein Springen der Ansicht!)\n    const daten = [...(appsmith.store.lokaleBewaesserungData || Bewaesserung_Lesen.data || [])];\n    const index = daten.findIndex(r => \n      String(r.rowIndex) === String(item.rowIndex) || \n      (String(r.Ventil).trim() === String(item.Ventil).trim() && String(r.Status || \"\").toLowerCase() !== \"fertig\")\n    );\n    \n    if (index !== -1) {\n      daten[index] = { ...daten[index], Status: 'Fertig' };\n      await storeValue('lokaleBewaesserungData', daten);\n      await storeValue('lastUpdate', Date.now());\n    }\n\n    // 2. Im Hintergrund Google Sheets aktualisieren\n    if (item.rowIndex !== undefined) {\n      await Bewaesserung_Update_Status.run({\n        \"realRowIndex\": item.rowIndex\n      });\n    }\n\n    // Bewaesserung_Lesen.run() wurde hier bewusst entfernt, \n    // damit der Screen absolut stabil bleibt und nicht mehr neu lädt!\n  })()\n}}",
   "parentColumnSpace": 22.78125,
   "parentId": "u9fh82k9bp",
   "parentRowSpace": 10,
