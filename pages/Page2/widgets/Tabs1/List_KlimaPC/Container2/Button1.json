@@ -3,7 +3,7 @@
   "borderRadius": "{{appsmith.theme.borderRadius.appBorderRadius}}",
   "bottomRow": 4,
   "boxShadow": "none",
-  "buttonColor": "{{\n  (() => {\n    const item = typeof currentItem !== 'undefined' ? currentItem : null;\n    if (!item || item.isHeader) return \"#E0E0E0\";\n\n    const daten = Bewaesserung_Lesen.data || [];\n    const rawVentil = item.Ventil ?? item.Ventil_Links ?? item.Ventil_Rechts ?? \"\";\n    const aktivesVentil = String(rawVentil).trim();\n\n    if (!aktivesVentil) return \"#E0E0E0\";\n\n    const e = daten.findLast(row => {\n      const vVal = String(row.Ventil || row.ventilName || \"\").trim();\n      const status = String(row.Status || \"\").trim().toLowerCase();\n      const matchesVentil = (vVal === aktivesVentil) || (!isNaN(parseFloat(vVal)) && !isNaN(parseFloat(aktivesVentil)) && parseFloat(vVal) === parseFloat(aktivesVentil));\n      return matchesVentil && status !== \"fertig\";\n    });\n\n    if (!e || !e.Programm) return \"#E0E0E0\"; \n\n    const prog = String(e.Programm).trim().toLowerCase();\n    switch (prog) {\n      case \"viel\": return \"#1d4ed8\";\n      case \"wenig\": return \"#38bdf8\";\n      case \"paletten\": return \"#f59e0b\";\n      case \"topfen\": return \"#10b981\";\n      default: return \"#E0E0E0\";\n    }\n  })()\n}}",
+  "buttonColor": "{{ Data_Helper.ermittleVentilFarbe(currentItem, 'Ventil', 'Leer') }}",
   "buttonVariant": "PRIMARY",
   "disabledWhenInvalid": false,
   "dynamicBindingPathList": [
