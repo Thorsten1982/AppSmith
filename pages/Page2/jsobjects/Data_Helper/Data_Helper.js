@@ -123,33 +123,34 @@ export default {
 
   // 4. Speichert den Eintrag im lokalen Store (mit Re-Render-Trigger)
   speichereEintrag: async (activeVentil, modusWert, programm, bemerkung) => {
-    const jetzigerZeitstempel = moment().format('DD.MM.YYYY HH:mm');
-    const daten = [...(appsmith.store.lokaleBewaesserungData || Bewaesserung_Lesen.data || [])];
+  const jetzigerZeitstempel = moment().format('DD.MM.YYYY HH:mm');
+  const daten = [...(appsmith.store.lokaleBewaesserungData || Bewaesserung_Lesen.data || [])];
 
-    let existIndex = daten.findIndex(r => {
-      const match = String(r.Ventil).trim() === String(activeVentil).trim();
-      const unfertig = String(r.Status || "").trim().toLowerCase() !== "fertig";
-      return match && unfertig;
-    });
+  let existIndex = daten.findIndex(r => {
+    const match = String(r.Ventil).trim() === String(activeVentil).trim();
+    const unfertig = String(r.Status || "").trim().toLowerCase() !== "fertig";
+    return match && unfertig;
+  });
 
-    const neuerEintrag = {
-      Ventil: activeVentil,
-      Modus: modusWert,
-      Programm: programm || "",
-      Zeitstempel: jetzigerZeitstempel,
-      Bemerkung: bemerkung || "",
-      Status: 'Offen'
-    };
+  const neuerEintrag = {
+    Ventil: activeVentil,
+    Modus: modusWert,
+    Programm: programm || "",
+    Zeitstempel: jetzigerZeitstempel,
+    Bemerkung: bemerkung || "",
+    Status: 'Offen',
+    Leer: false // Explicit zurücksetzen
+  };
 
-    if (existIndex !== -1) {
-      daten[existIndex] = { ...daten[existIndex], ...neuerEintrag };
-    } else {
-      daten.unshift(neuerEintrag);
-    }
+  if (existIndex !== -1) {
+    daten[existIndex] = { ...daten[existIndex], ...neuerEintrag };
+  } else {
+    daten.unshift(neuerEintrag);
+  }
 
-    await storeValue('lokaleBewaesserungData', [...daten]);
-    await storeValue('lastUpdate', Date.now());
-  },
+  await storeValue('lokaleBewaesserungData', [...daten]);
+  await storeValue('lastUpdate', Date.now()); // Löst das sofortige flackerfreie Re-Render aus
+},
 
   // 5. Verarbeitet, formatiert und gruppiert die KlimaPC-Daten zentral
   holeKlimaPCData: (rawDaten, stammdaten, gewaehltesTab) => {
