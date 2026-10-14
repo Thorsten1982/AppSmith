@@ -38,7 +38,7 @@ export default {
     return `${diffDays} Tage`;
   },
 
-  // 2. Ermittelt die Button-Farbe je nach Status (prüft zuerst den lokalen Store-Override)
+  // 2. Ermittelt die Button-Farbe je nach Status
   ermittleVentilFarbe: (currentItem, ventSpalte, leerSpalte) => {
     const rawVal = String(currentItem[ventSpalte] || "").trim();
     if (!rawVal) return '#3b82f6';
@@ -46,7 +46,6 @@ export default {
     const btnValFloat = parseFloat(rawVal.replace(",", "."));
     const btnValKey = isNaN(btnValFloat) ? rawVal : btnValFloat.toFixed(2);
     
-    // Lokaler Store-Override greift sofort (True Optimistic UI)
     const localLeerOverride = appsmith.store['Ventil_Leer_' + btnValKey];
     const isLeerCurrent = localLeerOverride !== undefined 
       ? localLeerOverride 
@@ -140,7 +139,6 @@ export default {
 
     const targetKey = Number(String(activeVentil).replace(",", ".")).toFixed(2);
 
-    // Sofortiger lokaler Override -> schaltet die UI / Farbe im selben Moment um!
     await storeValue('Ventil_Leer_' + targetKey, false);
 
     let existIndex = daten.findIndex(r => {
@@ -168,7 +166,6 @@ export default {
     await storeValue('lokaleBewaesserungData', [...daten]);
     await storeValue('lastUpdate', Date.now());
 
-    // Stammdaten im Hintergrund in Google Sheets aktualisieren
     const stammdaten = Stammdaten.data || [];
     
     const stammRow = stammdaten.find(s => {
@@ -246,4 +243,41 @@ export default {
 
     const jetzt = gefiltert.filter(r => String(r.Modus || "").trim().toLowerCase() === 'jetzt');
     const zeit = gefiltert.filter(r => String(r.Modus || "").trim().toLowerCase() === 'zeit');
-    const spaeter = gefilert.filter(r => String(r.Modus || "").trim().toLowerCase() ===
+    const spaeter = gefiltert.filter(r => String(r.Modus || "").trim().toLowerCase() === 'später');
+
+    const ergebnis = [];
+    if (jetzt.length > 0) {
+      ergebnis.push({ isHeader: true, titel: "⚡ JETZT" });
+      ergebnis.push(...jetzt);
+    }
+    if (zeit.length > 0) {
+      ergebnis.push({ isHeader: true, titel: "⏰ ZEIT" });
+      ergebnis.push(...zeit);
+    }
+    if (spaeter.length > 0) {
+      ergebnis.push({ isHeader: true, titel: "📅 SPÄTER" });
+      ergebnis.push(...spaeter);
+    }
+
+    return ergebnis;
+  },
+
+  // 6. Setzt den Status im Store auf 'Fertig' (Optimistic UI ohne Neuladen)
+  entferneLokalenEintrag: async (item, aktuelleDaten) => {
+    const neueDaten = (aktuelleDaten || []).map(r => {
+      const match = 
+        (item.echterIndex !== undefined && String(r.echterIndex) === String(item.echterIndex)) || 
+        (item.rowIndex !== undefined && String(r.rowIndex) === String(item.rowIndex)) ||
+        (String(r.Ventil).trim() === String(item.Ventil).trim() && String(r.Modus).trim() === String(item.Modus).trim());
+
+      if (match) {
+        return { ...r, Status: 'Fertig' };
+      }
+      return r;
+    });
+
+    await storeValue('lokaleBewaesserungData', neueDaten);
+    await storeValue('lastUpdate', Date.now());
+    return item.echterIndex !== undefined ? item.echterIndex : item.rowIndex;
+  }
+};
