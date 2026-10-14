@@ -38,22 +38,29 @@ export default {
     return `${diffDays} Tage`;
   },
 
-  // 2. Ermittelt die Button-Farbe je nach Status
+  // 2. Ermittelt die Button-Farbe je nach Status (prüft zuerst den lokalen Store-Override)
   ermittleVentilFarbe: (currentItem, ventSpalte, leerSpalte) => {
     const rawVal = String(currentItem[ventSpalte] || "").trim();
     if (!rawVal) return '#3b82f6';
     
-    const isLeerCurrent = currentItem[leerSpalte] === true || String(currentItem[leerSpalte]).trim().toUpperCase() === "TRUE";
+    const btnValFloat = parseFloat(rawVal.replace(",", "."));
+    const btnValKey = isNaN(btnValFloat) ? rawVal : btnValFloat.toFixed(2);
+    
+    // Lokaler Store-Override greift sofort (True Optimistic UI)
+    const localLeerOverride = appsmith.store['Ventil_Leer_' + btnValKey];
+    const isLeerCurrent = localLeerOverride !== undefined 
+      ? localLeerOverride 
+      : (currentItem[leerSpalte] === true || String(currentItem[leerSpalte]).trim().toUpperCase() === "TRUE");
+    
     if (isLeerCurrent) return '#e5e7eb';
     
     const bewaesserungQuelle = appsmith.store.lokaleBewaesserungData || Bewaesserung_Lesen.data || [];
-    const btnValFloat = parseFloat(rawVal.replace(",", "."));
 
     const alleEintraege = bewaesserungQuelle.filter(row => {
       const vRaw = String(row.Ventil || "").trim();
       if (!vRaw) return false;
-      const vFloat = parseFloat(vRaw.replace(",", "."));
-      return vRaw === rawVal || (!isNaN(vFloat) && !isNaN(btnValFloat) && vFloat.toFixed(2) === btnValFloat.toFixed(2));
+      const vKey = Number(vRaw.replace(",", ".")).toFixed(2);
+      return vKey === btnValKey;
     });
 
     if (alleEintraege.length > 0) {
@@ -101,18 +108,21 @@ export default {
     const rawVal = String(currentItem[ventSpalte] || "").trim();
     if (!rawVal) return "";
     
-    const num = parseFloat(rawVal.replace(",", "."));
-    const btnVal = isNaN(num) ? rawVal : num.toFixed(2);
+    const btnVal = Number(rawVal.replace(",", ".")).toFixed(2);
 
-    const isLeer = currentItem[leerSpalte] === true || String(currentItem[leerSpalte]).toUpperCase() === "TRUE";
-    if (appsmith.store['Ventil_Leer_' + btnVal] || isLeer) {
+    const localLeerOverride = appsmith.store['Ventil_Leer_' + btnVal];
+    const isLeer = localLeerOverride !== undefined 
+      ? localLeerOverride 
+      : (currentItem[leerSpalte] === true || String(currentItem[leerSpalte]).toUpperCase() === "TRUE");
+
+    if (isLeer) {
       return btnVal;
     }
 
     const bewaesserungQuelle = appsmith.store.lokaleBewaesserungData || Bewaesserung_Lesen.data || [];
     const filter = bewaesserungQuelle.filter(row => {
-      const rNum = parseFloat(String(row.Ventil || "0").replace(",", "."));
-      return !isNaN(rNum) && rNum.toFixed(2) === btnVal;
+      const rNum = Number(String(row.Ventil || "0").replace(",", ".")).toFixed(2);
+      return rNum === btnVal;
     });
 
     const formattedName = btnVal.startsWith("2") ? "2. " + btnVal : btnVal;
@@ -123,27 +133,25 @@ export default {
     return `${formattedName} (${statusText})`;
   },
 
-  // 4. Speichert den Eintrag im lokalen Store und korrigiert ggf. das Leer-Flag in Stammdaten
+  // 4. Speichert den Eintrag und setzt den Leer-Status im Store sofort auf false
   speichereEintrag: async (activeVentil, modusWert, programm, bemerkung) => {
     const jetzigerZeitstempel = moment().format('DD.MM.YYYY HH:mm');
     const daten = [...(appsmith.store.lokaleBewaesserungData || Bewaesserung_Lesen.data || [])];
 
-    const formatV = (val) => {
-      if (val === undefined || val === null || val === "") return "";
-      const n = parseFloat(String(val).replace(",", "."));
-      return isNaN(n) ? String(val).trim() : n.toFixed(2);
-    };
+    const targetKey = Number(String(activeVentil).replace(",", ".")).toFixed(2);
 
-    const targetV = formatV(activeVentil);
+    // Sofortiger lokaler Override -> schaltet die UI / Farbe im selben Moment um!
+    await storeValue('Ventil_Leer_' + targetKey, false);
 
     let existIndex = daten.findIndex(r => {
-      const match = formatV(r.Ventil) === targetV;
+      const rKey = Number(String(r.Ventil || "").replace(",", ".")).toFixed(2);
+      const match = rKey === targetKey;
       const unfertig = String(r.Status || "").trim().toLowerCase() !== "fertig";
       return match && unfertig;
     });
 
     const neuerEintrag = {
-      Ventil: targetV,
+      Ventil: targetKey,
       Modus: modusWert,
       Programm: programm || "",
       Zeitstempel: jetzigerZeitstempel,
@@ -160,17 +168,22 @@ export default {
     await storeValue('lokaleBewaesserungData', [...daten]);
     await storeValue('lastUpdate', Date.now());
 
-    // Stammdaten prüfen & Leer-Status in Google Sheets zurücksetzen, falls er True war
+    // Stammdaten im Hintergrund in Google Sheets aktualisieren
     const stammdaten = Stammdaten.data || [];
-    const stammRow = stammdaten.find(s => 
-      formatV(s.Ventil_Links) === targetV || formatV(s.Ventil_Rechts) === targetV
-    );
+    
+    const stammRow = stammdaten.find(s => {
+      const lVal = s.Ventil_Links !== undefined && s.Ventil_Links !== null && s.Ventil_Links !== "" ? Number(String(s.Ventil_Links).replace(",", ".")).toFixed(2) : "";
+      const rVal = s.Ventil_Rechts !== undefined && s.Ventil_Rechts !== null && s.Ventil_Rechts !== "" ? Number(String(s.Ventil_Rechts).replace(",", ".")).toFixed(2) : "";
+      return lVal === targetKey || rVal === targetKey;
+    });
 
     if (stammRow) {
-      const isLinks = formatV(stammRow.Ventil_Links) === targetV;
+      const lVal = stammRow.Ventil_Links !== undefined && stammRow.Ventil_Links !== null && stammRow.Ventil_Links !== "" ? Number(String(stammRow.Ventil_Links).replace(",", ".")).toFixed(2) : "";
+      const isLinks = lVal === targetKey;
       const leerSpalte = isLinks ? 'Status_Leer_Links' : 'Status_Leer_Rechts';
       
       const aktuellerWert = stammRow[leerSpalte];
+
       if (aktuellerWert === true || String(aktuellerWert).toUpperCase() === "TRUE") {
         if (typeof Stammdaten_Update !== 'undefined') {
           await storeValue('activeVentil', activeVentil);
@@ -233,41 +246,4 @@ export default {
 
     const jetzt = gefiltert.filter(r => String(r.Modus || "").trim().toLowerCase() === 'jetzt');
     const zeit = gefiltert.filter(r => String(r.Modus || "").trim().toLowerCase() === 'zeit');
-    const spaeter = gefiltert.filter(r => String(r.Modus || "").trim().toLowerCase() === 'später');
-
-    const ergebnis = [];
-    if (jetzt.length > 0) {
-      ergebnis.push({ isHeader: true, titel: "⚡ JETZT" });
-      ergebnis.push(...jetzt);
-    }
-    if (zeit.length > 0) {
-      ergebnis.push({ isHeader: true, titel: "⏰ ZEIT" });
-      ergebnis.push(...zeit);
-    }
-    if (spaeter.length > 0) {
-      ergebnis.push({ isHeader: true, titel: "📅 SPÄTER" });
-      ergebnis.push(...spaeter);
-    }
-
-    return ergebnis;
-  },
-
-  // 6. Setzt den Status im Store auf 'Fertig' (Optimistic UI ohne Neuladen)
-  entferneLokalenEintrag: async (item, aktuelleDaten) => {
-    const neueDaten = (aktuelleDaten || []).map(r => {
-      const match = 
-        (item.echterIndex !== undefined && String(r.echterIndex) === String(item.echterIndex)) || 
-        (item.rowIndex !== undefined && String(r.rowIndex) === String(item.rowIndex)) ||
-        (String(r.Ventil).trim() === String(item.Ventil).trim() && String(r.Modus).trim() === String(item.Modus).trim());
-
-      if (match) {
-        return { ...r, Status: 'Fertig' };
-      }
-      return r;
-    });
-
-    await storeValue('lokaleBewaesserungData', neueDaten);
-    await storeValue('lastUpdate', Date.now());
-    return item.echterIndex !== undefined ? item.echterIndex : item.rowIndex;
-  }
-};
+    const spaeter = gefilert.filter(r => String(r.Modus || "").trim().toLowerCase() ===
