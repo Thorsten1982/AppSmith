@@ -47,12 +47,12 @@ export default {
     if (isLeerCurrent) return '#e5e7eb';
     
     const bewaesserungQuelle = appsmith.store.lokaleBewaesserungData || Bewaesserung_Lesen.data || [];
-    const btnValFloat = parseFloat(rawVal);
+    const btnValFloat = parseFloat(rawVal.replace(",", "."));
 
     const alleEintraege = bewaesserungQuelle.filter(row => {
       const vRaw = String(row.Ventil || "").trim();
       if (!vRaw) return false;
-      const vFloat = parseFloat(vRaw);
+      const vFloat = parseFloat(vRaw.replace(",", "."));
       return vRaw === rawVal || (!isNaN(vFloat) && !isNaN(btnValFloat) && vFloat.toFixed(2) === btnValFloat.toFixed(2));
     });
 
@@ -101,7 +101,8 @@ export default {
     const rawVal = String(currentItem[ventSpalte] || "").trim();
     if (!rawVal) return "";
     
-    const btnVal = parseFloat(rawVal).toFixed(2);
+    const num = parseFloat(rawVal.replace(",", "."));
+    const btnVal = isNaN(num) ? rawVal : num.toFixed(2);
 
     const isLeer = currentItem[leerSpalte] === true || String(currentItem[leerSpalte]).toUpperCase() === "TRUE";
     if (appsmith.store['Ventil_Leer_' + btnVal] || isLeer) {
@@ -109,9 +110,10 @@ export default {
     }
 
     const bewaesserungQuelle = appsmith.store.lokaleBewaesserungData || Bewaesserung_Lesen.data || [];
-    const filter = bewaesserungQuelle.filter(row => 
-      parseFloat(row.Ventil || 0).toFixed(2) === btnVal
-    );
+    const filter = bewaesserungQuelle.filter(row => {
+      const rNum = parseFloat(String(row.Ventil || "0").replace(",", "."));
+      return !isNaN(rNum) && rNum.toFixed(2) === btnVal;
+    });
 
     const formattedName = btnVal.startsWith("2") ? "2. " + btnVal : btnVal;
 
@@ -121,36 +123,65 @@ export default {
     return `${formattedName} (${statusText})`;
   },
 
-  // 4. Speichert den Eintrag im lokalen Store (mit Re-Render-Trigger)
+  // 4. Speichert den Eintrag im lokalen Store und korrigiert ggf. das Leer-Flag in Stammdaten
   speichereEintrag: async (activeVentil, modusWert, programm, bemerkung) => {
-  const jetzigerZeitstempel = moment().format('DD.MM.YYYY HH:mm');
-  const daten = [...(appsmith.store.lokaleBewaesserungData || Bewaesserung_Lesen.data || [])];
+    const jetzigerZeitstempel = moment().format('DD.MM.YYYY HH:mm');
+    const daten = [...(appsmith.store.lokaleBewaesserungData || Bewaesserung_Lesen.data || [])];
 
-  let existIndex = daten.findIndex(r => {
-    const match = String(r.Ventil).trim() === String(activeVentil).trim();
-    const unfertig = String(r.Status || "").trim().toLowerCase() !== "fertig";
-    return match && unfertig;
-  });
+    const formatV = (val) => {
+      if (val === undefined || val === null || val === "") return "";
+      const n = parseFloat(String(val).replace(",", "."));
+      return isNaN(n) ? String(val).trim() : n.toFixed(2);
+    };
 
-  const neuerEintrag = {
-    Ventil: activeVentil,
-    Modus: modusWert,
-    Programm: programm || "",
-    Zeitstempel: jetzigerZeitstempel,
-    Bemerkung: bemerkung || "",
-    Status: 'Offen',
-    Leer: false // Explicit zurücksetzen
-  };
+    const targetV = formatV(activeVentil);
 
-  if (existIndex !== -1) {
-    daten[existIndex] = { ...daten[existIndex], ...neuerEintrag };
-  } else {
-    daten.unshift(neuerEintrag);
-  }
+    let existIndex = daten.findIndex(r => {
+      const match = formatV(r.Ventil) === targetV;
+      const unfertig = String(r.Status || "").trim().toLowerCase() !== "fertig";
+      return match && unfertig;
+    });
 
-  await storeValue('lokaleBewaesserungData', [...daten]);
-  await storeValue('lastUpdate', Date.now()); // Löst das sofortige flackerfreie Re-Render aus
-},
+    const neuerEintrag = {
+      Ventil: targetV,
+      Modus: modusWert,
+      Programm: programm || "",
+      Zeitstempel: jetzigerZeitstempel,
+      Bemerkung: bemerkung || "",
+      Status: 'Offen'
+    };
+
+    if (existIndex !== -1) {
+      daten[existIndex] = { ...daten[existIndex], ...neuerEintrag };
+    } else {
+      daten.unshift(neuerEintrag);
+    }
+
+    await storeValue('lokaleBewaesserungData', [...daten]);
+    await storeValue('lastUpdate', Date.now());
+
+    // Stammdaten prüfen & Leer-Status in Google Sheets zurücksetzen, falls er True war
+    const stammdaten = Stammdaten.data || [];
+    const stammRow = stammdaten.find(s => 
+      formatV(s.Ventil_Links) === targetV || formatV(s.Ventil_Rechts) === targetV
+    );
+
+    if (stammRow) {
+      const isLinks = formatV(stammRow.Ventil_Links) === targetV;
+      const leerSpalte = isLinks ? 'Status_Leer_Links' : 'Status_Leer_Rechts';
+      
+      const aktuellerWert = stammRow[leerSpalte];
+      if (aktuellerWert === true || String(aktuellerWert).toUpperCase() === "TRUE") {
+        if (typeof Stammdaten_Update !== 'undefined') {
+          await storeValue('activeVentil', activeVentil);
+          await Stammdaten_Update.run({
+            "targetIndex": stammRow.rowIndex,
+            "neuerStatus": ""
+          });
+        }
+      }
+    }
+  },
 
   // 5. Verarbeitet, formatiert und gruppiert die KlimaPC-Daten zentral
   holeKlimaPCData: (rawDaten, stammdaten, gewaehltesTab) => {
@@ -239,4 +270,4 @@ export default {
     await storeValue('lastUpdate', Date.now());
     return item.echterIndex !== undefined ? item.echterIndex : item.rowIndex;
   }
-}
+};
